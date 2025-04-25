@@ -1,0 +1,42 @@
+{
+  "name": "@arx-research/libburner-common",
+  "version": "0.0.1",
+  "description": "LibBurner - Common library",
+  "contributors": [
+    {
+      "name": "Michal Leszczynski",
+      "email": "ml@arx.sh",
+      "url": "https://github.com/icedevml"
+    }
+  ],
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "nfc"
+  ],
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "homepage": "https://github.com/arx-research/libburner#readme",
+  "bugs": {
+    "url": "https://github.com/arx-research/libburner/issues/new/choose"
+  },
+  "main": "./lib.esm/index.js",
+  "module": "./lib.esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib.esm/index.js"
+    }
+  },
+  "scripts": {
+    "build": "yarn && ./node_modules/.bin/tsc"
+  },
+  "dependencies": {
+    "viem": "2.28.0",
+    "@cometh/connect-core-sdk": "0.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "typescript": "^5.8.3"
+  }
+}

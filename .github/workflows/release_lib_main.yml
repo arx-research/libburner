@@ -1,0 +1,31 @@
+name: Release libburner (main)
+
+on:
+  push:
+    tags:
+      - 'libburner-v*'
+
+jobs:
+  release_main_lib:
+    environment: production
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Install Node.JS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies (libburner)
+        run: |
+          cd libburner
+          yarn install --frozen-lockfile --production=false
+      - name: Run tsc (libburner)
+        run: |
+          cd libburner
+          yarn build
+      - name: Publish package to npmjs
+        run: cd libburner && yarn publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.RELEASE_NPM_TOKEN }}

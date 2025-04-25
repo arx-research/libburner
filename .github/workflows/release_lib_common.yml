@@ -1,0 +1,31 @@
+name: Release libburner-common
+
+on:
+  push:
+    tags:
+      - 'libburner-common-v*'
+
+jobs:
+  release_common_lib:
+    environment: production
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Install Node.JS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies (libburner-common)
+        run: |
+          cd libburner-common
+          yarn install --frozen-lockfile --production=false
+      - name: Run tsc (libburner-common)
+        run: |
+          cd libburner-common
+          yarn build
+      - name: Publish package to npmjs
+        run: cd libburner-common && yarn publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.RELEASE_NPM_TOKEN }}
