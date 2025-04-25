@@ -1,1 +1,1 @@
-export const ARX_FWD_API = "http://localhost:3000"
+export const ARX_FWD_API = "https://tx.burner.pro"
