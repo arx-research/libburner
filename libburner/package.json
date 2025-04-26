@@ -1,6 +1,6 @@
 {
   "name": "@arx-research/libburner",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "LibBurner - High level library for Arx Burner tags interaction.",
   "contributors": [
     {
@@ -32,7 +32,7 @@
     "build": "cd ../libburner-common && yarn build && cd ../libburner && yarn && yarn add ../libburner-common && ./node_modules/.bin/tsc"
   },
   "dependencies": {
-    "@arx-research/libburner-common": "0.0.4",
+    "@arx-research/libburner-common": "0.0.5",
     "@arx-research/libhalo": "^1.10.16",
     "axios": "^1.8.4",
     "viem": "2.28.0",
