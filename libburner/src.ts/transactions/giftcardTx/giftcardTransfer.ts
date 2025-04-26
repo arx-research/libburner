@@ -63,17 +63,19 @@ export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferAr
     })
 
     const userOperationHash = submitRes.data.userOperationHash
+    const sendJWT = submitRes.data.jwt
+
     let receiptRes
     let retry = 0
 
     while (true) {
         receiptRes = await axios.get(ARX_FWD_API + "/giftcard/userop/receipt", {
             params: {
-                hash: userOperationHash
+                jwt: sendJWT
             }
         })
 
-        if (receiptRes.data.txHash) {
+        if (receiptRes.data.receipt) {
             break;
         }
 
@@ -85,5 +87,9 @@ export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferAr
         await new Promise(r => setTimeout(r, 1500))
     }
 
-    return receiptRes.data.txHash
+    if (receiptRes.data.receipt.status !== "success") {
+        throw new Error("Transaction receipt has status: " + receiptRes.data.receipt.status)
+    }
+
+    return receiptRes.data.receipt.txHash
 }
