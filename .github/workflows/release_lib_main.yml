@@ -24,7 +24,7 @@ jobs:
       - name: Run tsc (libburner)
         run: |
           cd libburner
-          yarn build
+          ./node_modules/.bin/tsc
       - name: Publish package to npmjs
         run: cd libburner && yarn publish --access public
         env:
