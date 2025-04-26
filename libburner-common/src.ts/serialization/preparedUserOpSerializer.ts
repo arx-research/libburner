@@ -61,8 +61,8 @@ export function serializeUserOp(userOperation: PrepareUserOperationReturnType): 
         callGasLimit: serializeBN(userOperation.callGasLimit!),
         preVerificationGas: serializeBN(userOperation.preVerificationGas!),
         verificationGasLimit: serializeBN(userOperation.verificationGasLimit!),
-        factory: ensureAddress(userOperation.factory),
-        factoryData: ensureHex(userOperation.factoryData)
+        factory: userOperation.factory ? ensureAddress(userOperation.factory) : null,
+        factoryData: userOperation.factoryData ? ensureHex(userOperation.factoryData) : null
     }
 }
 
@@ -82,7 +82,7 @@ export function unserializeUserOp(account: ComethSafeSmartAccount, serializedOp:
         callGasLimit: unserializeBN(serializedOp.callGasLimit),
         preVerificationGas: unserializeBN(serializedOp.preVerificationGas),
         verificationGasLimit: unserializeBN(serializedOp.verificationGasLimit),
-        factory: ensureAddress(serializedOp.factory),
-        factoryData: ensureHex(serializedOp.factoryData)
+        factory: serializedOp.factory ? ensureAddress(serializedOp.factory) : undefined,
+        factoryData: serializedOp.factoryData ? ensureHex(serializedOp.factoryData) : undefined
     }
 }

@@ -19,8 +19,8 @@ export interface SerializedUserOperation {
     callGasLimit: SerializedBN
     preVerificationGas: SerializedBN
     verificationGasLimit: SerializedBN
-    factory: Address
-    factoryData: Hex
+    factory: Address | null
+    factoryData: Hex | null
 }
 
 export interface EncodeCallDataParams {
