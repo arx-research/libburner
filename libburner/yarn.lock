@@ -7,10 +7,10 @@
   resolved "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.10.1.tgz"
   integrity sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==
 
-"@arx-research/libburner-common@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@arx-research/libburner-common/-/libburner-common-0.0.3.tgz#f65f8d8ee53a28cf6a400f0dc3d55e5637bfa1dc"
-  integrity sha512-RK9Gywkdc2AYNQID4f9YKZmSjC1QFhhxppF0SOzA8/RkMCoMsF5GN0ta/oR7pyS2SnrSussqYHrq6K3zRPxXvA==
+"@arx-research/libburner-common@0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@arx-research/libburner-common/-/libburner-common-0.0.4.tgz#674c0d5632083dccdfde1159538de84333c54819"
+  integrity sha512-wBQMUGORS1x2G98yFAhfruWTpZTCN5iZqXBWK343WbgQ05/krRgdwO9CREJPs97EpU6L2dGrGA67dHTivcvB6g==
   dependencies:
     "@cometh/connect-core-sdk" "0.0.2"
     viem "2.28.0"
