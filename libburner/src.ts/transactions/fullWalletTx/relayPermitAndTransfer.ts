@@ -4,6 +4,7 @@ import {WalletClient} from "viem";
 import {usd2BaseToken} from "@arx-research/libburner-common"
 import {base} from "viem/chains";
 import {ARX_FWD_API} from "../../config.js";
+import {BurnerTransactionError} from "../../error.js";
 
 export type IRelayPermitAndTransferArgs = {
     sourceAddress: string,
@@ -31,11 +32,21 @@ export default async function relayPermitAndTransfer(args: IRelayPermitAndTransf
         signature: {r, s, v},
     }
 
-    const res = await axios.post(ARX_FWD_API + '/wallet/relay-permit-and-transfer',
-        body,
-        {
-            timeout: 1000 * 120,
-        })
+    let res
+
+    try {
+        res = await axios.post(ARX_FWD_API + '/wallet/relay-permit-and-transfer',
+            body,
+            {
+                timeout: 1000 * 120,
+            })
+    } catch (e) {
+        if (e instanceof axios.AxiosError && e.response?.data?.error) {
+            throw new BurnerTransactionError(e.response?.data?.error)
+        } else {
+            throw e
+        }
+    }
 
     return res.data.txHash
 }

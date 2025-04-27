@@ -4,6 +4,7 @@ import axios from "axios";
 import {UserOperation} from "viem/account-abstraction";
 import {encodeCallDataFromSerialized, EncodeCallDataParams, unserializeUserOp, usd2BaseToken} from "@arx-research/libburner-common";
 import {ARX_FWD_API} from "../../config.js";
+import {BurnerTransactionError} from "../../error.js";
 
 export interface IGiftcardMakeUSD2TransferArgs {
     chain: Chain
@@ -35,12 +36,22 @@ export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferAr
         }
     }
 
-    const prepRes = await axios.post(ARX_FWD_API + "/giftcard/userop/prepare", {
-        type: "giftcard",
-        eoaAddress: args.eoaAccount.address,
-        smartAccountAddress: args.smartAccountAddress,
-        callData: callDataReq
-    })
+    let prepRes
+
+    try {
+        prepRes = await axios.post(ARX_FWD_API + "/giftcard/userop/prepare", {
+            type: "giftcard",
+            eoaAddress: args.eoaAccount.address,
+            smartAccountAddress: args.smartAccountAddress,
+            callData: callDataReq
+        })
+    } catch (e) {
+        if (e instanceof axios.AxiosError && e.response?.data?.error) {
+            throw new BurnerTransactionError(e.response?.data?.error)
+        } else {
+            throw e
+        }
+    }
 
     const payloadPart = prepRes.data.jwt.split('.')[1]
     const payloadBytes = Buffer.from(payloadPart, "base64")
@@ -52,15 +63,24 @@ export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferAr
     // we will cross-check whether the callData returned by the server is matching with
     // the operation that we are planning to execute
     if (unserializedUserOp.callData !== expectedCallData) {
-        throw new Error("Mismatched call data serializations.")
+        throw new BurnerTransactionError("Mismatched call data serializations.")
     }
 
     const signature = await smartAccount.signUserOperation(unserializedUserOp as UserOperation)
+    let submitRes
 
-    const submitRes = await axios.post(ARX_FWD_API + "/giftcard/userop/send", {
-        jwt: prepRes.data.jwt,
-        signature,
-    })
+    try {
+        submitRes = await axios.post(ARX_FWD_API + "/giftcard/userop/send", {
+            jwt: prepRes.data.jwt,
+            signature,
+        })
+    } catch (e) {
+        if (e instanceof axios.AxiosError && e.response?.data?.error) {
+            throw new BurnerTransactionError(e.response?.data?.error)
+        } else {
+            throw e
+        }
+    }
 
     const userOperationHash = submitRes.data.userOperationHash
     const sendJWT = submitRes.data.jwt
@@ -69,18 +89,26 @@ export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferAr
     let retry = 0
 
     while (true) {
-        receiptRes = await axios.get(ARX_FWD_API + "/giftcard/userop/receipt", {
-            params: {
-                jwt: sendJWT
+        try {
+            receiptRes = await axios.get(ARX_FWD_API + "/giftcard/userop/receipt", {
+                params: {
+                    jwt: sendJWT
+                }
+            })
+        } catch (e) {
+            if (e instanceof axios.AxiosError && e.response?.data?.error) {
+                throw new BurnerTransactionError(e.response?.data?.error)
+            } else {
+                throw e
             }
-        })
+        }
 
         if (receiptRes.data.receipt) {
             break;
         }
 
         if (retry >= 60) {
-            throw new Error("Timed out trying to get receipt for operation: " + userOperationHash)
+            throw new BurnerTransactionError("Timed out trying to get receipt for operation: " + userOperationHash)
         }
 
         retry++
@@ -88,7 +116,7 @@ export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferAr
     }
 
     if (receiptRes.data.receipt.status !== "success") {
-        throw new Error("Transaction receipt has status: " + receiptRes.data.receipt.status)
+        throw new BurnerTransactionError("Transaction receipt has status: " + receiptRes.data.receipt.status)
     }
 
     return receiptRes.data.receipt.txHash

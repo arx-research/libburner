@@ -8,6 +8,8 @@ import {giftcardMakeUSD2Transfer} from "./transactions/giftcardTx/giftcardTransf
 import {dataStructDecoder, computeGiftcardAddress, IDataStructDecoderResult, usd2BaseToken} from "@arx-research/libburner-common";
 
 
+export * from './error.js'
+
 export type IHaloExecCallback = {
     (cmd: HaloCommandObject): Promise<HaloResponseObject>
 }

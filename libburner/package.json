@@ -1,6 +1,6 @@
 {
   "name": "@arx-research/libburner",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "LibBurner - High level library for Arx Burner tags interaction.",
   "contributors": [
     {
@@ -29,7 +29,7 @@
     }
   },
   "scripts": {
-    "build": "cd ../libburner-common && yarn build && cd ../libburner && yarn && yarn add ../libburner-common && ./node_modules/.bin/tsc"
+    "build": "cd ../libburner-common && yarn build && cd ../libburner && yarn && yarn add file:../libburner-common && ./node_modules/.bin/tsc"
   },
   "dependencies": {
     "@arx-research/libburner-common": "0.0.5",
