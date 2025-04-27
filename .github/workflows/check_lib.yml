@@ -22,19 +22,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install dependencies (libburner-common)
+      - name: Install dependencies
         run: |
-          cd libburner-common
           yarn install --frozen-lockfile --production=false
       - name: Run tsc (libburner-common)
         run: |
-          cd libburner-common
-          yarn build
-      - name: Install dependencies (libburner)
-        run: |
-          cd libburner
-          yarn install --frozen-lockfile --production=false
+          cd packages/libburner-common
+          yarn tsc
       - name: Run tsc (libburner)
         run: |
-          cd libburner
-          yarn build
+          cd packages/libburner
+          yarn tsc
