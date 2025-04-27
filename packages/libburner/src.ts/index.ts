@@ -13,13 +13,14 @@ import {
 import {createViemHaloAccount} from "./viem_account.js";
 import {base} from "viem/chains";
 import {publicActionsL2} from "viem/op-stack";
-import relayPermitAndTransfer from "./transactions/fullWalletTx/relayPermitAndTransfer.js";
-import {giftcardMakeUSD2Transfer} from "./transactions/giftcardTx/giftcardTransfer.js";
-import {dataStructDecoder, IDataStructDecoderResult} from "./tagData/dataStructDecoder.js";
-import {computeGiftcardAddress} from "./tagData/giftcardSmartAccount/address.js";
+import relayPermitAndTransfer from "./fullWallet/transactions/relayPermitAndTransfer.js";
+import {giftcardMakeUSD2Transfer} from "./giftcard/transactions/giftcardTransfer.js";
+import {dataStructDecoder, IDataStructDecoderResult} from "./burnerTagData/dataStructDecoder.js";
+import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";
 import {usd2BaseToken} from "./tokens/subsidizedTokenSpec.js";
 
 export * from './error.js'
+export * from './viem_account.js'
 
 export interface HaloResGetDataStruct {
   isPartial: boolean
