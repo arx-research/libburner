@@ -25,6 +25,18 @@
   "exports": {
     ".": {
       "import": "./lib.esm/index.js"
+    },
+    "./burnerTagData": {
+      "import": "./lib.esm/burnerTagData/index.js"
+    },
+    "./fullWallet": {
+      "import": "./lib.esm/fullWallet/index.js"
+    },
+    "./giftcard": {
+      "import": "./lib.esm/giftcard/index.js"
+    },
+    "./tokens": {
+      "import": "./lib.esm/tokens/index.js"
     }
   },
   "scripts": {
