@@ -1,4 +1,3 @@
-import {HaloCommandObject, HaloResGetDataStruct, HaloResponseObject, HexString} from "@arx-research/libhalo/types";
 import {
   Account,
   Address,
@@ -11,23 +10,24 @@ import {
   PublicClient,
   WalletClient
 } from "viem";
-import {createViemHaloAccount} from "@arx-research/libhalo/api/common";
+import {createViemHaloAccount} from "./viem_account.js";
 import {base} from "viem/chains";
 import {publicActionsL2} from "viem/op-stack";
 import relayPermitAndTransfer from "./transactions/fullWalletTx/relayPermitAndTransfer.js";
 import {giftcardMakeUSD2Transfer} from "./transactions/giftcardTx/giftcardTransfer.js";
-import {
-  dataStructDecoder,
-  computeGiftcardAddress,
-  IDataStructDecoderResult,
-  usd2BaseToken
-} from "@arx-research/libburner-common";
-
+import {dataStructDecoder, IDataStructDecoderResult} from "./tagData/dataStructDecoder.js";
+import {computeGiftcardAddress} from "./tagData/giftcardSmartAccount/address.js";
+import {usd2BaseToken} from "./tokens/subsidizedTokenSpec.js";
 
 export * from './error.js'
 
+export interface HaloResGetDataStruct {
+  isPartial: boolean
+  data: Record<string, unknown>
+}
+
 export type IHaloExecCallback = {
-  (cmd: HaloCommandObject): Promise<HaloResponseObject>
+  (cmd: unknown): Promise<unknown>
 }
 
 export type IGetDataResult = IDataStructDecoderResult & {
@@ -106,7 +106,7 @@ export default class Burner {
       throw new Error("Missing burner data.")
     }
 
-    return createViemHaloAccount(this.burnerData.eoaAddress as Hex, async (digest: HexString, subject: unknown) => {
+    return createViemHaloAccount(this.burnerData.eoaAddress as Hex, async (digest: string, subject: unknown) => {
       return await this.haloExecCb({
         "name": "sign",
         "keyNo": this.burnerData!.keyNumber,

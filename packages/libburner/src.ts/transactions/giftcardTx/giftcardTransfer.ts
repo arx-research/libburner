@@ -2,14 +2,13 @@ import {Account, Address, Chain, createPublicClient, Hex, http, PublicClient} fr
 import {createSafeSmartAccount} from "@cometh/connect-core-sdk";
 import axios from "axios";
 import {UserOperation} from "viem/account-abstraction";
-import {
-  encodeCallDataFromSerialized,
-  EncodeCallDataParams,
-  unserializeUserOp,
-  usd2BaseToken
-} from "@arx-research/libburner-common";
+import {usd2BaseToken} from "../../tokens/subsidizedTokenSpec.js";
 import {ARX_FWD_API} from "../../config.js";
 import {BurnerTransactionError} from "../../error.js";
+import {encodeCallDataFromSerialized} from "../../serialization/preparedCallData.js";
+import {unserializeUserOp} from "../../serialization/preparedUserOpSerializer.js";
+import {EncodeCallDataParams} from "../../serialization/types.js";
+
 
 export interface IGiftcardMakeUSD2TransferArgs {
   chain: Chain
