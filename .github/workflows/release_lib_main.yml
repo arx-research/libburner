@@ -34,6 +34,6 @@ jobs:
           cd packages/libburner
           yarn tsc
       - name: Publish package to npmjs
-        run: cd packages/libburner && yarn publish --access public
+        run: cd packages/libburner && yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.RELEASE_NPM_TOKEN }}

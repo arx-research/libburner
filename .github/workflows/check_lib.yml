@@ -39,3 +39,11 @@ jobs:
         run: |
           cd packages/libburner
           yarn tsc
+      - name: Pack libburner-common
+        run: |
+          cd packages/libburner-common
+          yarn pack --dry-run
+      - name: Pack libburner
+        run: |
+          cd packages/libburner
+          yarn pack --dry-run
