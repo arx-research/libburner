@@ -45,8 +45,6 @@ export function unserializeBN(data: SerializedBN): bigint {
 }
 
 export function serializeUserOp(userOperation: PrepareUserOperationReturnType): SerializedUserOperation {
-  console.log('userOperation to serialize', userOperation)
-
   return {
     paymaster: ensureAddress(userOperation.paymaster),
     sender: ensureAddress(userOperation.sender),
