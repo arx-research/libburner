@@ -1,7 +1,7 @@
 import {generatePermitTypedData} from "./generatePermitTypedData.js";
 import axios from "axios";
 import {Address, PublicClient, WalletClient} from "viem";
-import {usd2BaseToken} from "@arx-research/libburner-common"
+import {usd2BaseToken} from "../../tokens/subsidizedTokenSpec.js";
 import {base} from "viem/chains";
 import {ARX_FWD_API} from "../../config.js";
 import {BurnerTransactionError} from "../../error.js";

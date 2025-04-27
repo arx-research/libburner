@@ -1,6 +1,6 @@
 {
   "name": "@arx-research/libburner",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "LibBurner - High level library for Arx Burner tags interaction.",
   "contributors": [
     {
@@ -28,19 +28,21 @@
     }
   },
   "scripts": {
-    "build": "cd ../libburner-common && yarn build && cd ../libburner && yarn && yarn add file:../libburner-common && ./node_modules/.bin/tsc"
+    "build": "tsc"
   },
   "dependencies": {
-    "@arx-research/libburner-common": "workspace:*",
-    "@arx-research/libhalo": "^1.10.16",
     "@cometh/connect-core-sdk": "^0.0.2",
+    "@noble/curves": "^1.9.0",
+    "abitype": "^1.0.8",
     "axios": "^1.8.4",
     "viem": "2.28.0",
-    "wagmi": "^2.14.13",
-    "websocket": "^1.0.35"
+    "wagmi": "^2.14.13"
   },
   "devDependencies": {
-    "@types/websocket": "^1.0.10",
+    "@types/node": "^22.15.2",
     "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "@arx-research/libhalo": "^1.10.16"
   }
 }

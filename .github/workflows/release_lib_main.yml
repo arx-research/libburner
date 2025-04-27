@@ -25,10 +25,6 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install --frozen-lockfile
-      - name: Run tsc (libburner-common)
-        run: |
-          cd packages/libburner-common
-          yarn tsc
       - name: Run tsc (libburner)
         run: |
           cd packages/libburner
