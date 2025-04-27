@@ -17,15 +17,19 @@ jobs:
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
-      - name: Install dependencies (libburner-common)
+      - name: Enable corepack
         run: |
-          cd libburner-common
-          yarn install --frozen-lockfile --production=false
+          export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+          corepack enable
+          yarn -v
+      - name: Install dependencies
+        run: |
+          yarn install --frozen-lockfile
       - name: Run tsc (libburner-common)
         run: |
-          cd libburner-common
-          yarn build
+          cd packages/libburner-common
+          yarn tsc
       - name: Publish package to npmjs
-        run: cd libburner-common && yarn publish --access public
+        run: cd packages/libburner-common && yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.RELEASE_NPM_TOKEN }}

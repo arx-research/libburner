@@ -1,4 +1,4 @@
-import {Account, Address, Chain, createPublicClient, Hex, http} from "viem";
+import {Account, Address, Chain, createPublicClient, Hex, http, PublicClient} from "viem";
 import {createSafeSmartAccount} from "@cometh/connect-core-sdk";
 import axios from "axios";
 import {UserOperation} from "viem/account-abstraction";
@@ -13,6 +13,7 @@ import {BurnerTransactionError} from "../../error.js";
 
 export interface IGiftcardMakeUSD2TransferArgs {
   chain: Chain
+  publicClient: PublicClient
   eoaAccount: Account
   smartAccountAddress: Address
   destinationAddress: Address
@@ -20,14 +21,9 @@ export interface IGiftcardMakeUSD2TransferArgs {
 }
 
 export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferArgs) {
-  const publicClient = createPublicClient({
-    transport: http(),
-    chain: args.chain,
-  })
-
   const smartAccount = await createSafeSmartAccount({
     chain: args.chain,
-    publicClient: publicClient as any,
+    publicClient: args.publicClient,
     signer: args.eoaAccount,
     smartAccountAddress: args.smartAccountAddress,
   })

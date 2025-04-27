@@ -1,5 +1,16 @@
 import {HaloCommandObject, HaloResGetDataStruct, HaloResponseObject, HexString} from "@arx-research/libhalo/types";
-import {Account, Address, createPublicClient, createWalletClient, Hex, http, PublicClient, WalletClient} from "viem";
+import {
+  Account,
+  Address,
+  Chain,
+  createPublicClient,
+  createWalletClient,
+  defineChain,
+  Hex,
+  http,
+  PublicClient,
+  WalletClient
+} from "viem";
 import {createViemHaloAccount} from "@arx-research/libhalo/api/common";
 import {base} from "viem/chains";
 import {publicActionsL2} from "viem/op-stack";
@@ -28,14 +39,27 @@ export type ISendUSD2Args = {
   amount: bigint
 }
 
+type ChainRpcUrls = {
+  http: readonly string[]
+  webSocket?: readonly string[] | undefined
+}
+
+export type IBurnerConstructorArgs = {
+  haloExecCb: IHaloExecCallback
+  chainRpcUrls: ChainRpcUrls
+  burnerData?: IGetDataResult | null
+}
+
 export default class Burner {
   haloExecCb: IHaloExecCallback
+  chainRpcUrls: ChainRpcUrls
   burnerData: IGetDataResult | null
   keyPassword: string | null
 
-  constructor(haloExecCb: IHaloExecCallback, burnerData?: IGetDataResult | null) {
-    this.haloExecCb = haloExecCb
-    this.burnerData = burnerData ?? null
+  constructor(args: IBurnerConstructorArgs) {
+    this.haloExecCb = args.haloExecCb
+    this.chainRpcUrls = args.chainRpcUrls
+    this.burnerData = args.burnerData ?? null
     this.keyPassword = null
   }
 
@@ -104,9 +128,21 @@ export default class Burner {
     return this._asViemAccountNoCheck()
   }
 
+  _patchChain(chain: Chain) {
+    return defineChain({
+      ...chain,
+      fees: {
+        baseFeeMultiplier: 1.2
+      },
+      rpcUrls: {
+        default: this.chainRpcUrls,
+      },
+    })
+  }
+
   _getPublicClient(): PublicClient {
     return createPublicClient({
-      chain: base,
+      chain: this._patchChain(base),
       transport: http(),
     }).extend(publicActionsL2()) as PublicClient
   }
@@ -117,7 +153,7 @@ export default class Burner {
     }
 
     return createWalletClient({
-      chain: base,
+      chain: this._patchChain(base),
       transport: http(),
       account: this.asViemAccount() as Account,
     })
@@ -147,11 +183,7 @@ export default class Burner {
       throw new Error("Missing burner data.")
     }
 
-    const publicClient = createPublicClient({
-      chain: base,
-      transport: http()
-    }) as PublicClient
-
+    const publicClient = this._getPublicClient()
     const walletClient = this._getWalletClient()
 
     return await relayPermitAndTransfer({
@@ -169,7 +201,8 @@ export default class Burner {
     }
 
     return await giftcardMakeUSD2Transfer({
-      chain: base,
+      chain: this._patchChain(base),
+      publicClient: this._getPublicClient(),
       eoaAccount: this._asViemAccountNoCheck(),
       smartAccountAddress: this.burnerData.address as Address,
       destinationAddress: args.destinationAddress as Address,
