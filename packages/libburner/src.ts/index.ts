@@ -13,7 +13,7 @@ import {
 import {createViemHaloAccount} from "./viem_account.js";
 import {base} from "viem/chains";
 import {publicActionsL2} from "viem/op-stack";
-import relayPermitAndTransfer from "./fullWallet/transactions/relayPermitAndTransfer.js";
+import {relayPermitAndTransfer} from "./fullWallet/transactions/relayPermitAndTransfer.js";
 import {giftcardMakeUSD2Transfer} from "./giftcard/transactions/giftcardTransfer.js";
 import {dataStructDecoder, IDataStructDecoderResult} from "./burnerTagData/dataStructDecoder.js";
 import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";

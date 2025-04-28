@@ -14,7 +14,7 @@ export type IRelayPermitAndTransferArgs = {
   walletClient: WalletClient,
 }
 
-export default async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs) {
+export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs) {
   const {owner, deadline, v, r, s} = await generatePermitTypedData({
     tokenAddress: usd2BaseToken.erc2612ContractAddress,
     receiverContract: usd2BaseToken.receiverContractAddress,
