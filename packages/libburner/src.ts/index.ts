@@ -108,12 +108,13 @@ export default class Burner {
     }
 
     return createViemHaloAccount(this.burnerData.eoaAddress as Hex, async (digest: string, subject: unknown) => {
-      return await this.haloExecCb({
+      const haloRes = await this.haloExecCb({
         "name": "sign",
         "keyNo": this.burnerData!.keyNumber,
         "password": this.keyPassword,
         "digest": digest
-      })
+      }) as {signature: {ether: Hex}}
+      return haloRes.signature.ether as Hex
     })
   }
 

@@ -22,7 +22,7 @@ import {toAccount} from 'viem/accounts'
 import type {TypedData} from 'abitype'
 
 export type TSignDigestCallback = {
-  (digest: string, subject: unknown): Promise<any>;
+  (digest: string, subject: unknown): Promise<Hex>;
 }
 
 async function _verifySigner(address: Hex, digest: string, signature: Hex) {
@@ -41,8 +41,8 @@ export function createViemHaloAccount(address: Hex, signDigestCallback: TSignDig
 
     async signMessage({message}: { message: SignableMessage }): Promise<Hex> {
       const digest = hashMessage(message).replace('0x', '')
-      const haloResSign = await signDigestCallback(digest, {type: "message", message})
-      return await _verifySigner(address, digest, haloResSign.signature.ether as Hex)
+      const signature = await signDigestCallback(digest, {type: "message", message})
+      return await _verifySigner(address, digest, signature)
     },
 
     async signTransaction<
@@ -66,9 +66,9 @@ export function createViemHaloAccount(address: Hex, signDigestCallback: TSignDig
       })()
 
       const digest = keccak256(_serializer(signableTransaction)).replace('0x', '')
-      const haloResSign = await signDigestCallback(digest, {type: "transaction", transaction: signableTransaction})
+      const signature = await signDigestCallback(digest, {type: "transaction", transaction: signableTransaction})
       const parsedSignature = parseSignature(
-        await _verifySigner(address, digest, haloResSign.signature.ether as Hex))
+        await _verifySigner(address, digest, signature))
       return _serializer(transaction, parsedSignature)
     },
 
@@ -80,8 +80,8 @@ export function createViemHaloAccount(address: Hex, signDigestCallback: TSignDig
 
       const {...typedData} = parameters as unknown as SignTypedDataParameters
       const digest = hashTypedData(typedData).replace('0x', '')
-      const haloResSign = await signDigestCallback(digest, {type: "typedData", typedData: typedData})
-      return await _verifySigner(address, digest, haloResSign.signature.ether as Hex)
+      const signature = await signDigestCallback(digest, {type: "typedData", typedData: typedData})
+      return await _verifySigner(address, digest, signature)
     },
   })
 }
