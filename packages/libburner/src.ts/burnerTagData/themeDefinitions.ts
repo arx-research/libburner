@@ -251,7 +251,7 @@ export const FullThemes: { [key: string]: ITheme } = {
     public: false,
     apps: [
       {
-        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/DSCIcon-WnENPk6tQ8J6kZ2Q3cqb9YQ95AiWMX.svg',
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-icon-SynlqeRxop5QyvzOopv7nrHAZP0xqB.svg',
         name: 'Digital Spenders Club',
         url: 'https://spenders.club/',
       },
@@ -269,7 +269,7 @@ export const FullThemes: { [key: string]: ITheme } = {
     public: false,
     apps: [
       {
-        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/DSCIcon-WnENPk6tQ8J6kZ2Q3cqb9YQ95AiWMX.svg',
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-icon-SynlqeRxop5QyvzOopv7nrHAZP0xqB.svg',
         name: 'Digital Spenders Club',
         url: 'https://spenders.club/',
       },
@@ -287,7 +287,7 @@ export const FullThemes: { [key: string]: ITheme } = {
     public: false,
     apps: [
       {
-        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/DSCIcon-WnENPk6tQ8J6kZ2Q3cqb9YQ95AiWMX.svg',
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-icon-SynlqeRxop5QyvzOopv7nrHAZP0xqB.svg',
         name: 'Digital Spenders Club',
         url: 'https://spenders.club/',
       },
@@ -305,7 +305,7 @@ export const FullThemes: { [key: string]: ITheme } = {
     public: false,
     apps: [
       {
-        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/EnsIcon-7h3S8zc91CuyyrZmiu5oKoCNIpauN9.svg',
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/ens-icon-XNnvYTBHA5mzvRVZARjbMONxN1s2mW.svg',
         name: 'ENS',
         url: 'https://ens.domains/',
       },
