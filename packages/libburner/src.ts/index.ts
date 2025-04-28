@@ -19,6 +19,7 @@ import {dataStructDecoder, IDataStructDecoderResult} from "./burnerTagData/dataS
 import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";
 import {usd2BaseToken} from "./tokens/subsidizedTokenSpec.js";
 
+export {Hex, Address, Chain, Account}
 export * from './error.js'
 export * from './viem_account.js'
 
@@ -32,7 +33,7 @@ export type IHaloExecCallback = {
 }
 
 export type IGetDataResult = IDataStructDecoderResult & {
-  address: string
+  address: Address
 }
 
 export type ISendUSD2Args = {
