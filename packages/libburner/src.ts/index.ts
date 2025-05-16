@@ -17,7 +17,7 @@ import {relayPermitAndTransfer} from "./fullWallet/transactions/relayPermitAndTr
 import {giftcardMakeUSD2Transfer} from "./giftcard/transactions/giftcardTransfer.js";
 import {
   dataStructDecoder,
-  IDataStructDecoderResultETH
+  IDataStructDecoderResult
 } from "./burnerTagData/dataStructDecoder.js";
 import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";
 import {usd2BaseToken} from "./tokens/subsidizedTokenSpec.js";
@@ -35,7 +35,7 @@ export type IHaloExecCallback = {
   (cmd: unknown): Promise<unknown>
 }
 
-export type IGetDataResult = IDataStructDecoderResultETH & {
+export type IGetDataResult = IDataStructDecoderResult & {
   address: Address
 }
 
@@ -79,7 +79,7 @@ export default class Burner {
       }
     ) as HaloResGetDataStruct
 
-    const decoded = dataStructDecoder("BurnerETH", response)
+    const decoded = await dataStructDecoder(response)
     let address
 
     if (decoded.graffiti && decoded.graffiti.type === 'giftcard') {

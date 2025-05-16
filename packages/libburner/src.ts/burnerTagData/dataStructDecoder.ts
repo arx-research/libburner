@@ -1,12 +1,12 @@
-import {Address, Hex} from "viem";
-import {publicKeyToAddress} from "viem/accounts";
+import {Address} from "viem";
 
 import {defaultTheme, findTheme, ITheme} from "./themeDefinitions.js";
 import {graffitiDecoder, IGraffitiInfo} from "./graffitiDecoder.js";
 import uncompressPk from "../utils/uncompressPk.js";
 import hexDecode from "../utils/hexDecode.js";
 import pknToAddressETH from "../utils/pknToAddressETH.js";
-import {pknToAddressBTC} from "../utils/index.js";
+import pknToAddressBTC from "../utils/pknToAddressBTC.js";
+import {computeGiftcardAddress} from "../giftcard/index.js";
 
 
 export interface IHaloDataStruct {
@@ -14,36 +14,19 @@ export interface IHaloDataStruct {
   data: Record<string, unknown>
 }
 
-export type IDataStructDecoderResultETH = {
+export type IDataStructDecoderResult = {
   pk2: string
   pkN: string
   pkNAttest: string | undefined
   eoaAddress: Address
+  smartAccount: Address
+  btcAddress: string
   keyNumber: number
   color: string
   themeId: string
   graffiti: IGraffitiInfo | undefined
   theme: ITheme
 }
-
-export type IDataStructDecoderResultBTC = {
-  pk2: string
-  pkN: string
-  pkNAttest: string | undefined
-  eoaAddress: string
-  keyNumber: number
-  color: string
-  themeId: string
-  graffiti: IGraffitiInfo | undefined
-  theme: ITheme
-}
-
-export type DecodeMode = "BurnerETH" | "BurnerBTC";
-
-export type IDataStructDecoderResultType<T> =
-  T extends "BurnerETH" ? IDataStructDecoderResultETH :
-    T extends "BurnerBTC" ? IDataStructDecoderResultBTC :
-      never;
 
 function latchDecoder(latch: string | null) {
   if (!latch) return 0
@@ -52,17 +35,7 @@ function latchDecoder(latch: string | null) {
   return decoded.replace('.', '-')
 }
 
-function computeEOAAddress(decodeMode: DecodeMode, pkN: string) {
-  if (decodeMode === "BurnerETH") {
-    return pknToAddressETH(pkN)
-  } else if (decodeMode === "BurnerBTC") {
-    return pknToAddressBTC(pkN)
-  } else {
-    throw new Error("Invalid decodeMode.")
-  }
-}
-
-export function dataStructDecoder<T extends DecodeMode>(decodeMode: T, response: IHaloDataStruct): IDataStructDecoderResultType<T> {
+export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDataStructDecoderResult> {
   const pk8RawCompressed = response.data['compressedPublicKey:8']
   const pk9RawCompressed = response.data['compressedPublicKey:9']
   const pk2RawCompressed = response.data['compressedPublicKey:2']
@@ -90,32 +63,44 @@ export function dataStructDecoder<T extends DecodeMode>(decodeMode: T, response:
 
   // If there's a pk9 but not graffiti they aborted early, finish setup
   if (graffitiRaw == null && typeof pk9RawCompressed === 'string') {
+    const eoaAddress = pknToAddressETH(pk9RawCompressed)
+    const smartAccount = await computeGiftcardAddress(eoaAddress)
+    const btcAddress = pknToAddressBTC(pk9RawCompressed)
+
     return {
       pk2: uncompressPk(pk2RawCompressed),
       pkN: uncompressPk(pk9RawCompressed),
       pkNAttest: undefined,
-      eoaAddress: computeEOAAddress(decodeMode, pk9RawCompressed),
+      eoaAddress,
+      smartAccount,
+      btcAddress,
       keyNumber: 9,
       color: theme.sku,
       themeId: theme.id,
       graffiti: undefined,
       theme,
-    } as IDataStructDecoderResultType<T>
+    }
   }
 
   // If its a new card save pk8 and go to step 1
   if (graffitiRaw === null && typeof pk8RawCompressed === 'string') {
+    const eoaAddress = pknToAddressETH(pk8RawCompressed)
+    const smartAccount = await computeGiftcardAddress(eoaAddress)
+    const btcAddress = pknToAddressBTC(pk8RawCompressed)
+
     return {
       pk2: uncompressPk(pk2RawCompressed),
       pkN: uncompressPk(pk8RawCompressed),
       pkNAttest: pk8Attest,
-      eoaAddress: computeEOAAddress(decodeMode, pk8RawCompressed),
+      eoaAddress,
+      smartAccount,
+      btcAddress,
       keyNumber: 8,
       color: theme.sku,
       themeId: theme.id,
       graffiti: undefined,
       theme,
-    } as IDataStructDecoderResultType<T>
+    }
   }
 
   // If it's a setup pk9 card go to dashboard
@@ -125,17 +110,23 @@ export function dataStructDecoder<T extends DecodeMode>(decodeMode: T, response:
     const graffiti = graffitiDecoder(graffitiRaw)
     const theme = findTheme(graffiti?.themeId)
 
+    const eoaAddress = pknToAddressETH(pk9RawCompressed)
+    const smartAccount = await computeGiftcardAddress(eoaAddress)
+    const btcAddress = pknToAddressBTC(pk9RawCompressed)
+
     return {
       pk2: uncompressPk(pk2RawCompressed),
       pkN: uncompressPk(pk9RawCompressed),
       pkNAttest: undefined,
-      eoaAddress: computeEOAAddress(decodeMode, pk9RawCompressed),
+      eoaAddress,
+      smartAccount,
+      btcAddress,
       keyNumber: 9,
       color: theme.sku,
       themeId: theme.id,
       graffiti,
       theme,
-    } as IDataStructDecoderResultType<T>
+    }
   }
 
   // If it's a normal setup pk8 card
@@ -143,17 +134,23 @@ export function dataStructDecoder<T extends DecodeMode>(decodeMode: T, response:
     const graffiti = graffitiDecoder(graffitiRaw)
     const theme = findTheme(graffiti?.themeId)
 
+    const eoaAddress = pknToAddressETH(pk8RawCompressed)
+    const smartAccount = await computeGiftcardAddress(eoaAddress)
+    const btcAddress = pknToAddressBTC(pk8RawCompressed)
+
     return {
       pk2: uncompressPk(pk2RawCompressed),
       pkN: uncompressPk(pk8RawCompressed),
       pkNAttest: pk8Attest,
-      eoaAddress: computeEOAAddress(decodeMode, pk8RawCompressed),
+      eoaAddress,
+      smartAccount,
+      btcAddress,
       keyNumber: 8,
       color: theme.sku,
       themeId: theme.id,
       graffiti,
       theme,
-    } as IDataStructDecoderResultType<T>
+    }
   }
 
   throw new Error('Failed to parse data struct.')
