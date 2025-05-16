@@ -5,6 +5,8 @@ import {defaultTheme, findTheme, ITheme} from "./themeDefinitions.js";
 import {graffitiDecoder, IGraffitiInfo} from "./graffitiDecoder.js";
 import uncompressPk from "../utils/uncompressPk.js";
 import hexDecode from "../utils/hexDecode.js";
+import pknToAddressETH from "../utils/pknToAddressETH.js";
+import {pknToAddressBTC} from "../utils/index.js";
 
 
 export interface IHaloDataStruct {
@@ -12,7 +14,7 @@ export interface IHaloDataStruct {
   data: Record<string, unknown>
 }
 
-export type IDataStructDecoderResult = {
+export type IDataStructDecoderResultETH = {
   pk2: string
   pkN: string
   pkNAttest: string | undefined
@@ -24,6 +26,25 @@ export type IDataStructDecoderResult = {
   theme: ITheme
 }
 
+export type IDataStructDecoderResultBTC = {
+  pk2: string
+  pkN: string
+  pkNAttest: string | undefined
+  eoaAddress: string
+  keyNumber: number
+  color: string
+  themeId: string
+  graffiti: IGraffitiInfo | undefined
+  theme: ITheme
+}
+
+export type DecodeMode = "BurnerETH" | "BurnerBTC";
+
+export type IDataStructDecoderResultType<T> =
+  T extends "BurnerETH" ? IDataStructDecoderResultETH :
+    T extends "BurnerBTC" ? IDataStructDecoderResultBTC :
+      never;
+
 function latchDecoder(latch: string | null) {
   if (!latch) return 0
 
@@ -31,7 +52,17 @@ function latchDecoder(latch: string | null) {
   return decoded.replace('.', '-')
 }
 
-export function dataStructDecoder(response: IHaloDataStruct): IDataStructDecoderResult {
+function computeEOAAddress(decodeMode: DecodeMode, pkN: string) {
+  if (decodeMode === "BurnerETH") {
+    return pknToAddressETH(pkN)
+  } else if (decodeMode === "BurnerBTC") {
+    return pknToAddressBTC(pkN)
+  } else {
+    throw new Error("Invalid decodeMode.")
+  }
+}
+
+export function dataStructDecoder<T extends DecodeMode>(decodeMode: T, response: IHaloDataStruct): IDataStructDecoderResultType<T> {
   const pk8RawCompressed = response.data['compressedPublicKey:8']
   const pk9RawCompressed = response.data['compressedPublicKey:9']
   const pk2RawCompressed = response.data['compressedPublicKey:2']
@@ -63,13 +94,13 @@ export function dataStructDecoder(response: IHaloDataStruct): IDataStructDecoder
       pk2: uncompressPk(pk2RawCompressed),
       pkN: uncompressPk(pk9RawCompressed),
       pkNAttest: undefined,
-      eoaAddress: publicKeyToAddress(('0x' + uncompressPk(pk9RawCompressed)) as Hex),
+      eoaAddress: computeEOAAddress(decodeMode, pk9RawCompressed),
       keyNumber: 9,
       color: theme.sku,
       themeId: theme.id,
       graffiti: undefined,
       theme,
-    }
+    } as IDataStructDecoderResultType<T>
   }
 
   // If its a new card save pk8 and go to step 1
@@ -78,13 +109,13 @@ export function dataStructDecoder(response: IHaloDataStruct): IDataStructDecoder
       pk2: uncompressPk(pk2RawCompressed),
       pkN: uncompressPk(pk8RawCompressed),
       pkNAttest: pk8Attest,
-      eoaAddress: publicKeyToAddress(('0x' + uncompressPk(pk8RawCompressed)) as Hex),
+      eoaAddress: computeEOAAddress(decodeMode, pk8RawCompressed),
       keyNumber: 8,
       color: theme.sku,
       themeId: theme.id,
       graffiti: undefined,
       theme,
-    }
+    } as IDataStructDecoderResultType<T>
   }
 
   // If it's a setup pk9 card go to dashboard
@@ -98,13 +129,13 @@ export function dataStructDecoder(response: IHaloDataStruct): IDataStructDecoder
       pk2: uncompressPk(pk2RawCompressed),
       pkN: uncompressPk(pk9RawCompressed),
       pkNAttest: undefined,
-      eoaAddress: publicKeyToAddress(('0x' + uncompressPk(pk9RawCompressed)) as Hex),
+      eoaAddress: computeEOAAddress(decodeMode, pk9RawCompressed),
       keyNumber: 9,
       color: theme.sku,
       themeId: theme.id,
       graffiti,
       theme,
-    }
+    } as IDataStructDecoderResultType<T>
   }
 
   // If it's a normal setup pk8 card
@@ -116,13 +147,13 @@ export function dataStructDecoder(response: IHaloDataStruct): IDataStructDecoder
       pk2: uncompressPk(pk2RawCompressed),
       pkN: uncompressPk(pk8RawCompressed),
       pkNAttest: pk8Attest,
-      eoaAddress: publicKeyToAddress(('0x' + uncompressPk(pk8RawCompressed)) as Hex),
+      eoaAddress: computeEOAAddress(decodeMode, pk8RawCompressed),
       keyNumber: 8,
       color: theme.sku,
       themeId: theme.id,
       graffiti,
       theme,
-    }
+    } as IDataStructDecoderResultType<T>
   }
 
   throw new Error('Failed to parse data struct.')

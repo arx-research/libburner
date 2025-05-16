@@ -1,6 +1,6 @@
 {
   "name": "@arx-research/libburner",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "LibBurner - High level library for Arx Burner tags interaction.",
   "contributors": [
     {
@@ -37,6 +37,9 @@
     },
     "./tokens": {
       "import": "./lib.esm/tokens/index.js"
+    },
+    "./utils": {
+      "import": "./lib.esm/utils/index.js"
     }
   },
   "scripts": {
@@ -45,8 +48,10 @@
   "dependencies": {
     "@cometh/connect-core-sdk": "^0.0.2",
     "@noble/curves": "^1.9.0",
+    "@noble/secp256k1": "^2.2.3",
     "abitype": "^1.0.8",
     "axios": "^1.8.4",
+    "bitcoinjs-lib": "^6.1.7",
     "viem": "2.28.0",
     "wagmi": "^2.14.13"
   },

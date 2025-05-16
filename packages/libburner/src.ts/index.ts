@@ -15,7 +15,10 @@ import {base} from "viem/chains";
 import {publicActionsL2} from "viem/op-stack";
 import {relayPermitAndTransfer} from "./fullWallet/transactions/relayPermitAndTransfer.js";
 import {giftcardMakeUSD2Transfer} from "./giftcard/transactions/giftcardTransfer.js";
-import {dataStructDecoder, IDataStructDecoderResult} from "./burnerTagData/dataStructDecoder.js";
+import {
+  dataStructDecoder,
+  IDataStructDecoderResultETH
+} from "./burnerTagData/dataStructDecoder.js";
 import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";
 import {usd2BaseToken} from "./tokens/subsidizedTokenSpec.js";
 
@@ -32,7 +35,7 @@ export type IHaloExecCallback = {
   (cmd: unknown): Promise<unknown>
 }
 
-export type IGetDataResult = IDataStructDecoderResult & {
+export type IGetDataResult = IDataStructDecoderResultETH & {
   address: Address
 }
 
@@ -76,7 +79,7 @@ export default class Burner {
       }
     ) as HaloResGetDataStruct
 
-    const decoded = dataStructDecoder(response)
+    const decoded = dataStructDecoder("BurnerETH", response)
     let address
 
     if (decoded.graffiti && decoded.graffiti.type === 'giftcard') {
@@ -114,7 +117,7 @@ export default class Burner {
         "keyNo": this.burnerData!.keyNumber,
         "password": this.keyPassword,
         "digest": digest
-      }) as {signature: {ether: Hex}}
+      }) as { signature: { ether: Hex } }
       return haloRes.signature.ether as Hex
     })
   }
