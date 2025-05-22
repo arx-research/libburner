@@ -15,7 +15,10 @@ export type IRelayPermitAndTransferArgs = {
   preSendCallback?: () => Promise<boolean> | null,
 }
 
-export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs) {
+export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs & {preSendCallback?: null | undefined}): Promise<string>
+export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs & {preSendCallback: () => Promise<boolean>}): Promise<string | null>
+
+export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs): Promise<string | null> {
   const {owner, deadline, v, r, s} = await generatePermitTypedData({
     tokenAddress: usd2BaseToken.erc2612ContractAddress,
     receiverContract: usd2BaseToken.receiverContractAddress,
