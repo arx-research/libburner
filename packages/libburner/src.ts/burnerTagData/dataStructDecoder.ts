@@ -26,10 +26,13 @@ export type IDataStructDecoderResult = {
   themeId: string
   graffiti: IGraffitiInfo | undefined
   theme: ITheme
+  latch2Decoded: string | undefined
 }
 
-function latchDecoder(latch: string | null) {
-  if (!latch) return 0
+function latchDecoder(latch: string | null): string | null {
+  if (!latch) {
+    return null
+  }
 
   const decoded = hexDecode(latch)
   return decoded.replace('.', '-')
@@ -54,11 +57,17 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
     throw new Error('Missing required parameters.')
   }
 
+  let _latchDecoded = null
+  let latch2Decoded = undefined
+
   // We might have color data
   if (typeof latch2 === 'string') {
-    const latchDecoded = latchDecoder(latch2)
-    if (latchDecoded !== 0) theme = findTheme(latchDecoded)
-    // console.log('Theme found from latch2', theme)
+    _latchDecoded = latchDecoder(latch2)
+
+    if (_latchDecoded !== null) {
+      latch2Decoded = _latchDecoded
+      theme = findTheme(_latchDecoded)
+    }
   }
 
   // If there's a pk9 but not graffiti they aborted early, finish setup
@@ -79,6 +88,7 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
       themeId: theme.id,
       graffiti: undefined,
       theme,
+      latch2Decoded,
     }
   }
 
@@ -100,6 +110,7 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
       themeId: theme.id,
       graffiti: undefined,
       theme,
+      latch2Decoded,
     }
   }
 
@@ -126,6 +137,7 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
       themeId: theme.id,
       graffiti,
       theme,
+      latch2Decoded,
     }
   }
 
@@ -150,6 +162,7 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
       themeId: theme.id,
       graffiti,
       theme,
+      latch2Decoded,
     }
   }
 
