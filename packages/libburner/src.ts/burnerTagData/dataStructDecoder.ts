@@ -29,7 +29,7 @@ export type IDataStructDecoderResult = {
   latch2Decoded: string | undefined
 }
 
-function latchDecoder(latch: string | null): string | null {
+export function latchDecoder(latch: string | null): string | null {
   if (!latch) {
     return null
   }
