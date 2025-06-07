@@ -75,7 +75,7 @@ export default class Burner {
 
     const response = await this.haloExecCb({
         name: 'get_data_struct',
-        spec: 'latchValue:2,graffiti:1,compressedPublicKey:2,compressedPublicKey:8,compressedPublicKey:9,publicKeyAttest:8',
+        spec: 'latchValue:2,graffiti:1,compressedPublicKey:2,compressedPublicKey:9,publicKeyAttest:9,compressedPublicKey:8,publicKeyAttest:8',
       }
     ) as HaloResGetDataStruct
 

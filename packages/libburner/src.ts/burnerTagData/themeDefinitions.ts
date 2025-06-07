@@ -25,6 +25,7 @@ export const themeBaseColors = {
   mandarin: '#f37043',
   galaxy: '#6f2c91',
   darkGrey: '#241f21',
+  bitcoin: "#f7931a",
 }
 
 export const defaultTheme: ITheme = {
@@ -420,7 +421,20 @@ export const FullThemes: { [key: string]: ITheme } = {
     ],
   },
   q: {
-    id: 'q',
+    id: "q",
+    sku: "brnrbtca25b-orange",
+    color: themeBaseColors.bitcoin,
+    background:
+      "https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg",
+    backgroundSize: "16px",
+    backgroundRepeat: "repeat-x",
+    backgroundBlendMode: "soft-light",
+    nickname: "bitcoin",
+    public: false,
+    apps: [],
+  },            
+  r: {
+    id: 'r',
     sku: 'brnr128a25f-sapphirel1',
     color: themeBaseColors.sapphire,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
@@ -442,8 +456,8 @@ export const FullThemes: { [key: string]: ITheme } = {
       },
     ],
   },
-  r: {
-    id: 'r',
+  s: {
+    id: 's',
     sku: 'brnr128a25f.cherryl1',
     color: themeBaseColors.cherry,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
