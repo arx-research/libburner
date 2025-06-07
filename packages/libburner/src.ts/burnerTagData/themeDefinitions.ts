@@ -419,6 +419,52 @@ export const FullThemes: { [key: string]: ITheme } = {
       },
     ],
   },
+  q: {
+    id: 'q',
+    sku: 'brnr128a25f-sapphirel1',
+    color: themeBaseColors.sapphire,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
+    backgroundSize: '80px',
+    backgroundRepeat: 'repeat',
+    backgroundBlendMode: 'normal',
+    nickname: 'eth-foundation-sapphire-l1',
+    public: false,
+    apps: [
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/l1randd-aXavewVhe466JhU3AvsUEwqheIfIWn.svg',
+        name: 'L1 R&D',
+        url: 'https://notes.ethereum.org/@timbeiko/berlin-agenda',
+      },
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/calendar-DkOR58UELOzA9b9dZVY9EXEkUusUfN.svg',
+        name: 'Workshop Calendar',
+        url: 'https://docs.google.com/spreadsheets/d/1UqtuuBrClZCW-HD0Rd_5JUFjI8OhLXfWNtO8Wyu19YI/edit?gid=513673475#gid=513673475',
+      },
+    ],
+  },
+  r: {
+    id: 'r',
+    sku: 'brnr128a25f.cherryl1',
+    color: themeBaseColors.cherry,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
+    backgroundSize: '80px',
+    backgroundRepeat: 'repeat',
+    backgroundBlendMode: 'normal',
+    nickname: 'eth-foundation-cherry-l1',
+    public: false,
+    apps: [
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/l1randd-aXavewVhe466JhU3AvsUEwqheIfIWn.svg',
+        name: 'L1 R&D',
+        url: 'https://notes.ethereum.org/@timbeiko/berlin-agenda',
+      },
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/calendar-DkOR58UELOzA9b9dZVY9EXEkUusUfN.svg',
+        name: 'Workshop Calendar',
+        url: 'https://docs.google.com/spreadsheets/d/1UqtuuBrClZCW-HD0Rd_5JUFjI8OhLXfWNtO8Wyu19YI/edit?gid=513673475#gid=513673475',
+      },
+    ],
+  },
 }
 
 export const findTheme = (query?: string): ITheme => {
