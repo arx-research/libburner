@@ -13,6 +13,7 @@ export type IRelayPermitAndTransferArgs = {
   publicClient: PublicClient,
   walletClient: WalletClient,
   preSendCallback?: () => Promise<boolean> | null,
+  extraData?: Record<string, unknown> | undefined
 }
 
 export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs & {preSendCallback?: null | undefined}): Promise<string>
@@ -36,6 +37,7 @@ export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs):
     value: args.valueEth,
     deadline,
     signature: {r, s, v},
+    extraData: args.extraData,
   }
 
   // optional callback to validate if the wallet state isn't stale
