@@ -13,6 +13,7 @@ export type TSubsidizedTokenSpec = {
   receiverContractAddress: Hex,
   relayerForwarderAddress: Hex,
   relayerURL: string,
+  minTransferAmount: BigInt,
 }
 
 export type TRelayPermitAndTransferParams = {

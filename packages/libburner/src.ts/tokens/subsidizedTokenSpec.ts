@@ -6,6 +6,7 @@ const CHAIN_ID_BASE_SEPOLIA = 84532
 export const usd2BaseToken: TSubsidizedTokenSpec = {
   chainId: CHAIN_ID_BASE,
   decimals: 6,
+  minTransferAmount: BigInt(10000),
   erc2612ContractAddress: '0xfe26e72431Bd82c285655e897F25104E547c4c07',
   receiverContractAddress: '0xe5B2Cd54B950a34e518Ec34F30c137f6b40D1ACB',
   relayerForwarderAddress: '0xd04f98c88ce1054c90022ee34d566b9237a1203c',
@@ -16,6 +17,7 @@ export const usd2BaseToken: TSubsidizedTokenSpec = {
 export const usd2BaseSepoliaToken: TSubsidizedTokenSpec = {
   chainId: CHAIN_ID_BASE_SEPOLIA,
   decimals: 6,
+  minTransferAmount: BigInt(1),
   erc2612ContractAddress: '0x504f0eaf318cB4bF3290DcA07cEb3ea393822C20',
   receiverContractAddress: '0x3ECe77731794C007E9ABeB3D84D723af5d0259Ee',
   relayerForwarderAddress: '0xd04f98c88ce1054c90022ee34d566b9237a1203c',
