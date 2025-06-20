@@ -1,10 +1,11 @@
 import {generatePermitTypedData} from "./generatePermitTypedData.js";
 import axios from "axios";
 import {Address, PublicClient, WalletClient} from "viem";
-import {usd2BaseToken} from "../../tokens/subsidizedTokenSpec.js";
+import {usd2BaseToken} from "../../tokens/index.js";
 import {base} from "viem/chains";
 import {ARX_FWD_API} from "../../config.js";
 import {BurnerTransactionError} from "../../error.js";
+import {TRelayPermitAndTransferParams} from "../../tokens/index.js";
 
 export type IRelayPermitAndTransferArgs = {
   sourceAddress: Address,
@@ -29,7 +30,7 @@ export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs):
     walletClient: args.walletClient,
   })
 
-  const body = {
+  const body: TRelayPermitAndTransferParams = {
     owner,
     chainId: base.id,
     recipientAddress: args.recipientAddress,

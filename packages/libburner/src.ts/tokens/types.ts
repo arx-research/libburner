@@ -26,5 +26,6 @@ export type TRelayPermitAndTransferParams = {
     r: string,
     s: string,
     v: number
-  }
+  },
+  extraData?: Record<string, unknown> | undefined
 }
