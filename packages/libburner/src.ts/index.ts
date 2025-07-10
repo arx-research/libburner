@@ -187,6 +187,25 @@ export default class Burner {
     })
   }
 
+  async getUSDCBalance() {
+    if (!this.burnerData) {
+      throw new Error("Missing burner data.")
+    }
+
+    return await this._getPublicClient().readContract({
+      address: usdcBaseToken.erc2612ContractAddress as Hex,
+      abi: [{
+        inputs: [{name: "owner", type: "address"}],
+        name: "balanceOf",
+        outputs: [{name: "", type: "uint256"}],
+        stateMutability: "view",
+        type: "function",
+      }],
+      functionName: 'balanceOf',
+      args: [this.burnerData.address as Hex],
+    })
+  }
+
   async _sendUSD2Wallet(args: ISendUSD2Args) {
     if (!this.burnerData) {
       throw new Error("Missing burner data.")
