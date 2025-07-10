@@ -20,7 +20,7 @@ import {
   IDataStructDecoderResult
 } from "./burnerTagData/dataStructDecoder.js";
 import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";
-import {usd2BaseToken} from "./tokens/subsidizedTokenSpec.js";
+import {usd2BaseToken, usdcBaseToken} from "./tokens/subsidizedTokenSpec.js";
 
 export {Hex, Address, Chain, Account}
 export * from './error.js'
@@ -39,10 +39,13 @@ export type IGetDataResult = IDataStructDecoderResult & {
   address: Address
 }
 
-export type ISendUSD2Args = {
+export type ISendUSDArgs = {
   destinationAddress: Address,
   amount: bigint
 }
+
+export type ISendUSD2Args = ISendUSDArgs
+export type ISendUSDCArgs = ISendUSDArgs
 
 type ChainRpcUrls = {
   http: readonly string[]
@@ -193,6 +196,25 @@ export default class Burner {
     const walletClient = this._getWalletClient()
 
     return await relayPermitAndTransfer({
+      subsidizedToken: usd2BaseToken,
+      publicClient: publicClient,
+      walletClient: walletClient,
+      sourceAddress: this.burnerData.eoaAddress,
+      recipientAddress: args.destinationAddress,
+      valueEth: args.amount.toString(),
+    })
+  }
+
+  async _sendUSDCWallet(args: ISendUSDCArgs) {
+    if (!this.burnerData) {
+      throw new Error("Missing burner data.")
+    }
+
+    const publicClient = this._getPublicClient()
+    const walletClient = this._getWalletClient()
+
+    return await relayPermitAndTransfer({
+      subsidizedToken: usdcBaseToken,
       publicClient: publicClient,
       walletClient: walletClient,
       sourceAddress: this.burnerData.eoaAddress,
@@ -225,6 +247,18 @@ export default class Burner {
       return await this._sendUSD2Wallet(args)
     } else if (this.burnerData.graffiti.type === "giftcard") {
       return await this._sendUSD2Giftcard(args)
+    } else {
+      throw new Error("Unsupported tag type: " + this.burnerData.graffiti.type)
+    }
+  }
+
+  async sendUSDC(args: ISendUSDCArgs) {
+    if (!this.burnerData || !this.burnerData.graffiti) {
+      throw new Error("Missing burner data.")
+    }
+
+    if (this.burnerData.graffiti.type === "wallet") {
+      return await this._sendUSDCWallet(args)
     } else {
       throw new Error("Unsupported tag type: " + this.burnerData.graffiti.type)
     }

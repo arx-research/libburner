@@ -1,13 +1,14 @@
 import {generatePermitTypedData} from "./generatePermitTypedData.js";
 import axios from "axios";
 import {Address, PublicClient, WalletClient} from "viem";
-import {usd2BaseToken} from "../../tokens/index.js";
+import {TSubsidizedTokenSpec, usd2BaseToken} from "../../tokens/index.js";
 import {base} from "viem/chains";
 import {ARX_FWD_API} from "../../config.js";
 import {BurnerTransactionError} from "../../error.js";
 import {TRelayPermitAndTransferParams} from "../../tokens/index.js";
 
 export type IRelayPermitAndTransferArgs = {
+  subsidizedToken?: TSubsidizedTokenSpec,
   sourceAddress: Address,
   recipientAddress: Address,
   valueEth: string,
@@ -21,9 +22,11 @@ export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs &
 export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs & {preSendCallback: () => Promise<boolean>}): Promise<string | null>
 
 export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs): Promise<string | null> {
+  const subsidizedToken = args.subsidizedToken ?? usd2BaseToken
+
   const {owner, deadline, v, r, s} = await generatePermitTypedData({
-    tokenAddress: usd2BaseToken.erc2612ContractAddress,
-    receiverContract: usd2BaseToken.receiverContractAddress,
+    tokenAddress: subsidizedToken.erc2612ContractAddress,
+    receiverContract: subsidizedToken.receiverContractAddress,
     fromAccount: args.sourceAddress,
     valueEth: args.valueEth,
     publicClient: args.publicClient,
@@ -34,7 +37,7 @@ export async function relayPermitAndTransfer(args: IRelayPermitAndTransferArgs):
     owner,
     chainId: base.id,
     recipientAddress: args.recipientAddress,
-    receiverContract: usd2BaseToken.receiverContractAddress,
+    receiverContract: subsidizedToken.receiverContractAddress,
     value: args.valueEth,
     deadline,
     signature: {r, s, v},
