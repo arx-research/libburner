@@ -78,7 +78,7 @@ function generateDeadline() {
 async function generateDomainData(tokenAddress: Address, publicClient: PublicClient) {
   return {
     name: await getERC2612TokenName(tokenAddress, publicClient),
-    version: '1',
+    version: tokenAddress.toLowerCase() === '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'.toLowerCase() ? '2' : '1',
     chainId: await getChainId(publicClient),
     verifyingContract: tokenAddress as Hex,
   }
