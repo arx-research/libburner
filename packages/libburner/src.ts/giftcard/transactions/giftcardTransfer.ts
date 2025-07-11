@@ -1,4 +1,4 @@
-import {Account, Address, Chain, createPublicClient, Hex, http, PublicClient} from "viem";
+import {Account, Address, Chain, Hex, PublicClient} from "viem";
 import {createSafeSmartAccount} from "@cometh/connect-core-sdk";
 import axios from "axios";
 import {UserOperation} from "viem/account-abstraction";
@@ -17,7 +17,11 @@ export interface IGiftcardMakeUSD2TransferArgs {
   smartAccountAddress: Address
   destinationAddress: Address
   amount: BigInt
+  preSendCallback?: (() => Promise<boolean>) | null | undefined,
 }
+
+export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferArgs & {preSendCallback?: null | undefined}): Promise<string>
+export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferArgs & {preSendCallback: () => Promise<boolean>}): Promise<string | null>
 
 export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferArgs) {
   const smartAccount = await createSafeSmartAccount({
@@ -67,6 +71,11 @@ export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferAr
   }
 
   const signature = await smartAccount.signUserOperation(unserializedUserOp as UserOperation)
+
+  if (args.preSendCallback && !await args.preSendCallback()) {
+    return null;
+  }
+
   let submitRes
 
   try {
@@ -119,5 +128,5 @@ export async function giftcardMakeUSD2Transfer(args: IGiftcardMakeUSD2TransferAr
     throw new BurnerTransactionError("Transaction receipt has status: " + receiptRes.data.receipt.status)
   }
 
-  return receiptRes.data.receipt.txHash
+  return receiptRes.data.receipt.txHash as string
 }

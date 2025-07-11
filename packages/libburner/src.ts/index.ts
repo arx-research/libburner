@@ -41,7 +41,8 @@ export type IGetDataResult = IDataStructDecoderResult & {
 
 export type ISendUSDArgs = {
   destinationAddress: Address,
-  amount: bigint
+  amount: bigint,
+  preSendCallback?: () => Promise<boolean>,
 }
 
 export type ISendUSD2Args = ISendUSDArgs
@@ -63,12 +64,14 @@ export default class Burner {
   chainRpcUrls: ChainRpcUrls
   burnerData: IGetDataResult | null
   keyPassword: string | null
+  rawPwdDigest: string | null
 
   constructor(args: IBurnerConstructorArgs) {
     this.haloExecCb = args.haloExecCb
     this.chainRpcUrls = args.chainRpcUrls
     this.burnerData = args.burnerData ?? null
     this.keyPassword = null
+    this.rawPwdDigest = null
   }
 
   async getData(): Promise<IGetDataResult> {
@@ -106,7 +109,17 @@ export default class Burner {
       throw new Error("Missing burner data.")
     }
 
+    this.rawPwdDigest = null
     this.keyPassword = keyPassword
+  }
+
+  setRawPwdDigest(rawPwdDigest: string) {
+    if (!this.burnerData) {
+      throw new Error("Missing burner data.")
+    }
+
+    this.keyPassword = null
+    this.rawPwdDigest = rawPwdDigest
   }
 
   _asViemAccountNoCheck(): Account {
@@ -115,11 +128,19 @@ export default class Burner {
     }
 
     return createViemHaloAccount(this.burnerData.eoaAddress as Hex, async (digest: string, subject: unknown) => {
+      let pwdKey: Record<string, string> = {}
+
+      if (this.keyPassword) {
+        pwdKey = {password: this.keyPassword}
+      } else if (this.rawPwdDigest) {
+        pwdKey = {rawPwdDigest: this.rawPwdDigest}
+      }
+
       const haloRes = await this.haloExecCb({
         "name": "sign",
         "keyNo": this.burnerData!.keyNumber,
-        "password": this.keyPassword,
-        "digest": digest
+        "digest": digest,
+        ...pwdKey
       }) as { signature: { ether: Hex } }
       return haloRes.signature.ether as Hex
     })
@@ -214,14 +235,20 @@ export default class Burner {
     const publicClient = this._getPublicClient()
     const walletClient = this._getWalletClient()
 
-    return await relayPermitAndTransfer({
+    const callArgs = {
       subsidizedToken: usd2BaseToken,
       publicClient: publicClient,
       walletClient: walletClient,
       sourceAddress: this.burnerData.eoaAddress,
       recipientAddress: args.destinationAddress,
       valueEth: args.amount.toString(),
-    })
+    }
+
+    if (args.preSendCallback) {
+      return await relayPermitAndTransfer({...callArgs, preSendCallback: args.preSendCallback})
+    } else {
+      return await relayPermitAndTransfer({...callArgs})
+    }
   }
 
   async _sendUSDCWallet(args: ISendUSDCArgs) {
@@ -232,14 +259,20 @@ export default class Burner {
     const publicClient = this._getPublicClient()
     const walletClient = this._getWalletClient()
 
-    return await relayPermitAndTransfer({
+    const callArgs = {
       subsidizedToken: usdcBaseToken,
       publicClient: publicClient,
       walletClient: walletClient,
       sourceAddress: this.burnerData.eoaAddress,
       recipientAddress: args.destinationAddress,
       valueEth: args.amount.toString(),
-    })
+    }
+
+    if (args.preSendCallback) {
+      return await relayPermitAndTransfer({...callArgs, preSendCallback: args.preSendCallback})
+    } else {
+      return await relayPermitAndTransfer({...callArgs})
+    }
   }
 
   async _sendUSD2Giftcard(args: ISendUSD2Args) {
@@ -247,15 +280,24 @@ export default class Burner {
       throw new Error("Missing burner data.")
     }
 
-    return await giftcardMakeUSD2Transfer({
+    const callData = {
       chain: this._patchChain(base),
       publicClient: this._getPublicClient(),
       eoaAccount: this._asViemAccountNoCheck(),
       smartAccountAddress: this.burnerData.address as Address,
       destinationAddress: args.destinationAddress as Address,
       amount: args.amount,
-    })
+    }
+
+    if (args.preSendCallback) {
+      return await giftcardMakeUSD2Transfer({...callData, preSendCallback: args.preSendCallback})
+    } else {
+      return await giftcardMakeUSD2Transfer({...callData})
+    }
   }
+
+  async sendUSD2(args: ISendUSD2Args & { preSendCallback?: null | undefined }): Promise<string>;
+  async sendUSD2(args: ISendUSD2Args & { preSendCallback: () => Promise<boolean> }): Promise<string | null>;
 
   async sendUSD2(args: ISendUSD2Args) {
     if (!this.burnerData || !this.burnerData.graffiti) {
@@ -270,6 +312,9 @@ export default class Burner {
       throw new Error("Unsupported tag type: " + this.burnerData.graffiti.type)
     }
   }
+
+  async sendUSDC(args: ISendUSDCArgs & { preSendCallback?: null | undefined }): Promise<string>;
+  async sendUSDC(args: ISendUSDCArgs & { preSendCallback: () => Promise<boolean> }): Promise<string | null>;
 
   async sendUSDC(args: ISendUSDCArgs) {
     if (!this.burnerData || !this.burnerData.graffiti) {

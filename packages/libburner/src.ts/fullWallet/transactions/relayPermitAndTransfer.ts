@@ -14,7 +14,7 @@ export type IRelayPermitAndTransferArgs = {
   valueEth: string,
   publicClient: PublicClient,
   walletClient: WalletClient,
-  preSendCallback?: () => Promise<boolean> | null,
+  preSendCallback?: (() => Promise<boolean>) | null | undefined,
   extraData?: Record<string, unknown> | undefined
 }
 
