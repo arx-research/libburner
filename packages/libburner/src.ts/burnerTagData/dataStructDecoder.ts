@@ -14,6 +14,13 @@ export interface IHaloDataStruct {
   data: Record<string, unknown>
 }
 
+export interface IHaloDataKeyFlags {
+  isExported: boolean
+  isImported: boolean
+  isPasswordProtected: boolean
+  rawSignCommandNotUsed: boolean
+}
+
 export type IDataStructDecoderResult = {
   pk2: string
   pkN: string
@@ -27,6 +34,7 @@ export type IDataStructDecoderResult = {
   graffiti: IGraffitiInfo | undefined
   theme: ITheme
   latch2Decoded: string | undefined
+  pkNFlags: IHaloDataKeyFlags | undefined
 }
 
 export function latchDecoder(latch: string | null): string | null {
@@ -38,7 +46,20 @@ export function latchDecoder(latch: string | null): string | null {
   return decoded.replace('.', '-')
 }
 
-export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDataStructDecoderResult> {
+function isHaloDataKeyFlags(obj: any): obj is IHaloDataKeyFlags {
+  return (
+    obj !== null &&
+    typeof obj === 'object' &&
+    typeof obj.isExported === 'boolean' &&
+    typeof obj.isImported === 'boolean' &&
+    typeof obj.isPasswordProtected === 'boolean' &&
+    typeof obj.rawSignCommandNotUsed === 'boolean'
+  )
+}
+
+export async function dataStructDecoder(
+  response: IHaloDataStruct
+): Promise<IDataStructDecoderResult> {
   const pk8RawCompressed = response.data['compressedPublicKey:8']
   const pk9RawCompressed = response.data['compressedPublicKey:9']
   const pk2RawCompressed = response.data['compressedPublicKey:2']
@@ -46,6 +67,8 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
   const pk9Attest = response.data['publicKeyAttest:9']
   const graffitiRaw = response.data['graffiti:1']
   const latch2 = response.data['latchValue:2']
+  const pk8Flags = response.data['keySlotFlags:8']
+  const pk9Flags = response.data['keySlotFlags:9']
   let theme = defaultTheme
 
   // Make sure we have everything we need
@@ -58,7 +81,10 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
     if (typeof pk9Attest !== 'string') {
       throw new Error('Missing required pk9 parameters.')
     }
-  } else if (typeof pk8RawCompressed !== 'string' || typeof pk8Attest !== 'string') {
+  } else if (
+    typeof pk8RawCompressed !== 'string' ||
+    typeof pk8Attest !== 'string'
+  ) {
     // pk8 tag case
     throw new Error('Missing required pk8 parameters.')
   }
@@ -99,6 +125,7 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
       graffiti: undefined,
       theme,
       latch2Decoded,
+      pkNFlags: isHaloDataKeyFlags(pk9Flags) ? pk9Flags : undefined
     }
   }
 
@@ -125,6 +152,7 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
       graffiti: undefined,
       theme,
       latch2Decoded,
+      pkNFlags: isHaloDataKeyFlags(pk8Flags) ? pk8Flags : undefined
     }
   }
 
@@ -156,6 +184,7 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
       graffiti,
       theme,
       latch2Decoded,
+      pkNFlags: isHaloDataKeyFlags(pk9Flags) ? pk9Flags : undefined
     }
   }
 
@@ -185,6 +214,7 @@ export async function dataStructDecoder(response: IHaloDataStruct): Promise<IDat
       graffiti,
       theme,
       latch2Decoded,
+      pkNFlags: isHaloDataKeyFlags(pk8Flags) ? pk8Flags : undefined
     }
   }
 
