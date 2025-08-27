@@ -27,7 +27,7 @@ __metadata:
     viem: "npm:2.28.0"
     wagmi: "npm:^2.14.13"
   peerDependencies:
-    "@arx-research/libhalo": ^1.10.16
+    "@arx-research/libhalo": ^1.14.0
   languageName: unknown
   linkType: soft
 

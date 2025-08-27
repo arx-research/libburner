@@ -1,6 +1,6 @@
 {
   "name": "@arx-research/libburner",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "LibBurner - High level library for Arx Burner tags interaction.",
   "contributors": [
     {
@@ -60,6 +60,6 @@
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "@arx-research/libhalo": "^1.10.16"
+    "@arx-research/libhalo": "^1.14.0"
   }
 }
