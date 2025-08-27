@@ -7,7 +7,7 @@ import {
   defineChain,
   Hex,
   http,
-  PublicClient,
+  PublicClient, recoverAddress, serializeSignature,
   WalletClient
 } from "viem";
 import {createViemHaloAccount} from "./viem_account.js";
@@ -21,6 +21,7 @@ import {
 } from "./burnerTagData/dataStructDecoder.js";
 import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";
 import {usd2BaseToken, usdcBaseToken} from "./tokens/subsidizedTokenSpec.js";
+import parseDERSignature, {secp256k1Order} from "./utils/parseDERSignature.js";
 
 export {Hex, Address, Chain, Account}
 export * from './error.js'
@@ -140,9 +141,29 @@ export default class Burner {
         "name": "sign",
         "keyNo": this.burnerData!.keyNumber,
         "digest": digest,
-        ...pwdKey
-      }) as { signature: { ether: Hex } }
-      return haloRes.signature.ether as Hex
+        ...pwdKey,
+        "skipPostprocessing": true,
+      }) as { signature: { der: string } }
+
+      const derSig = Buffer.from(haloRes.signature.der, "hex")
+      const parsedSig = parseDERSignature(derSig, secp256k1Order)
+
+      for (let yParity = 0; yParity <= 1; yParity++) {
+        const address = await recoverAddress({
+          hash: ('0x' + digest) as Hex,
+          signature: {
+            ...parsedSig,
+            yParity,
+          }
+        })
+
+        if (this.burnerData!.eoaAddress.toLowerCase() === address.toLowerCase()) {
+          return serializeSignature({...parsedSig, yParity})
+        }
+      }
+
+      throw new Error("This Burner card does not seem to contain the correct key for " +
+        "the subject account: " + this.burnerData!.eoaAddress);
     })
   }
 
