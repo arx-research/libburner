@@ -479,6 +479,24 @@ export const FullThemes: { [key: string]: ITheme } = {
       },
     ],
   },
+  t: {
+    id: 't',
+    sku: 'brnr128a25d.dgen1',
+    color: themeBaseColors.darkGrey,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/brnr128a25d-dgen1.jpg',
+    backgroundSize: '82px',
+    backgroundRepeat: 'repeat',
+    backgroundBlendMode: 'normal',
+    nickname: 'dgen1',
+    public: false,
+    apps: [
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dgen1-Icon.svg',
+        name: 'DGEN1',
+        url: 'https://recovery.freedomfactory.io',
+      },
+    ],
+  },
 }
 
 export const findTheme = (query?: string): ITheme => {
