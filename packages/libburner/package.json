@@ -1,6 +1,6 @@
 {
   "name": "@arx-research/libburner",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "LibBurner - High level library for Arx Burner tags interaction.",
   "contributors": [
     {
@@ -49,6 +49,7 @@
     "@cometh/connect-core-sdk": "^0.0.2",
     "@noble/curves": "^1.9.0",
     "@noble/secp256k1": "^2.2.3",
+    "@solana/web3.js": "^1.98.4",
     "abitype": "^1.0.8",
     "axios": "^1.8.4",
     "bitcoinjs-lib": "^6.1.7",
