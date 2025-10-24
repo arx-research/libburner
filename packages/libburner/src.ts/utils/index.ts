@@ -3,6 +3,7 @@ import hexDecode from "./hexDecode.js"
 
 import pknToAddressETH from "./pknToAddressETH.js"
 import pknToAddressBTC from "./pknToAddressBTC.js"
+import pknToSOLAddresses from "./pknToSOLAddresses.js"
 import uncompressPk from "./uncompressPk.js"
 import ensurePkCompressed from "./ensurePkCompressed.js"
 import ensurePkUncompressed from "./ensurePkUncompressed.js"
@@ -13,6 +14,8 @@ export {
 
   pknToAddressETH,
   pknToAddressBTC,
+  pknToSOLAddresses,
+
   uncompressPk,
   ensurePkCompressed,
   ensurePkUncompressed
