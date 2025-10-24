@@ -7,6 +7,7 @@ import hexDecode from "../utils/hexDecode.js";
 import pknToAddressETH from "../utils/pknToAddressETH.js";
 import pknToAddressBTC from "../utils/pknToAddressBTC.js";
 import {computeGiftcardAddress} from "../giftcard/index.js";
+import pknToSOLAddresses from "../utils/pknToSOLAddresses.js";
 
 
 export interface IHaloDataStruct {
@@ -28,6 +29,10 @@ export type IDataStructDecoderResult = {
   eoaAddress: Address
   smartAccount: Address
   btcAddress: string
+  solAddresses: {
+    vaultPDA: string
+    walletPDA: string
+  }
   keyNumber: number
   color: string
   themeId: string
@@ -107,6 +112,7 @@ export async function dataStructDecoder(
     const eoaAddress = pknToAddressETH(pk9RawCompressed)
     const smartAccount = await computeGiftcardAddress(eoaAddress)
     const btcAddress = pknToAddressBTC(pk9RawCompressed)
+    const solAddresses = pknToSOLAddresses(pk9RawCompressed)
 
     if (typeof pk9Attest !== 'string') {
       throw new Error('Missing pk9Attest.')
@@ -119,6 +125,7 @@ export async function dataStructDecoder(
       eoaAddress,
       smartAccount,
       btcAddress,
+      solAddresses,
       keyNumber: 9,
       color: theme.sku,
       themeId: theme.id,
@@ -134,6 +141,7 @@ export async function dataStructDecoder(
     const eoaAddress = pknToAddressETH(pk8RawCompressed)
     const smartAccount = await computeGiftcardAddress(eoaAddress)
     const btcAddress = pknToAddressBTC(pk8RawCompressed)
+    const solAddresses = pknToSOLAddresses(pk8RawCompressed)
 
     if (typeof pk8Attest !== 'string') {
       throw new Error('Missing pk8Attest.')
@@ -146,6 +154,7 @@ export async function dataStructDecoder(
       eoaAddress,
       smartAccount,
       btcAddress,
+      solAddresses,
       keyNumber: 8,
       color: theme.sku,
       themeId: theme.id,
@@ -166,6 +175,7 @@ export async function dataStructDecoder(
     const eoaAddress = pknToAddressETH(pk9RawCompressed)
     const smartAccount = await computeGiftcardAddress(eoaAddress)
     const btcAddress = pknToAddressBTC(pk9RawCompressed)
+    const solAddresses = pknToSOLAddresses(pk9RawCompressed)
 
     if (typeof pk9Attest !== 'string') {
       throw new Error('Missing pk9Attest.')
@@ -178,6 +188,7 @@ export async function dataStructDecoder(
       eoaAddress,
       smartAccount,
       btcAddress,
+      solAddresses,
       keyNumber: 9,
       color: theme.sku,
       themeId: theme.id,
@@ -196,6 +207,7 @@ export async function dataStructDecoder(
     const eoaAddress = pknToAddressETH(pk8RawCompressed)
     const smartAccount = await computeGiftcardAddress(eoaAddress)
     const btcAddress = pknToAddressBTC(pk8RawCompressed)
+    const solAddresses = pknToSOLAddresses(pk8RawCompressed)
 
     if (typeof pk8Attest !== 'string') {
       throw new Error('Missing pk8Attest.')
@@ -208,6 +220,7 @@ export async function dataStructDecoder(
       eoaAddress,
       smartAccount,
       btcAddress,
+      solAddresses,
       keyNumber: 8,
       color: theme.sku,
       themeId: theme.id,
