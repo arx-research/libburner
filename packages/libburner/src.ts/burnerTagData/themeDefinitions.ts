@@ -497,6 +497,24 @@ export const FullThemes: { [key: string]: ITheme } = {
       },
     ],
   },
+  u: {
+    id: 'u',
+    sku: 'brnr128a25c.nouns',
+    color: themeBaseColors.darkGrey,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/noun-bg.jpg',
+    backgroundSize: '82px',
+    backgroundRepeat: 'repeat',
+    backgroundBlendMode: 'normal',
+    nickname: 'noun',
+    public: false,
+    apps: [
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/noun-app.svg',
+        name: 'Nouns',
+        url: 'https://nouns.wtf/',
+      },
+    ],
+  },
 }
 
 export const findTheme = (query?: string): ITheme => {
