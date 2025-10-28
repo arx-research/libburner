@@ -432,7 +432,7 @@ export const FullThemes: { [key: string]: ITheme } = {
     nickname: "bitcoin",
     public: false,
     apps: [],
-  },            
+  },
   r: {
     id: 'r',
     sku: 'brnr128a25f-sapphirel1',
@@ -499,7 +499,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   },
   u: {
     id: 'u',
-    sku: 'brnr128a25c.nouns',
+    sku: 'brnr128a25c-nouns',
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/noun-bg.jpg',
     backgroundSize: '82px',
