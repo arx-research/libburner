@@ -458,7 +458,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   },
   s: {
     id: 's',
-    sku: 'brnr128a25f.cherryl1',
+    sku: 'brnr128a25f-cherryl1',
     color: themeBaseColors.cherry,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
     backgroundSize: '80px',
@@ -481,7 +481,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   },
   t: {
     id: 't',
-    sku: 'brnr128a25d.dgen1',
+    sku: 'brnr128a25d-dgen1',
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/brnr128a25d-dgen1.jpg',
     backgroundSize: '82px',
