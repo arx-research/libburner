@@ -9,6 +9,7 @@ export interface ITheme {
   nickname: string
   public: boolean
   apps: IThemeApp[]
+  disableAddEntropySetup?: boolean 
 }
 
 export interface IThemeApp {
@@ -514,6 +515,19 @@ export const FullThemes: { [key: string]: ITheme } = {
         url: 'https://nouns.wtf/',
       },
     ],
+  },
+  v: {
+    id: 'v',
+    sku: 'brnr128a25u-magazine',
+    color: themeBaseColors.acid,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
+    backgroundSize: '16px',
+    backgroundRepeat: 'repeat-x',
+    backgroundBlendMode: 'soft-light',
+    nickname: 'usecase-magazine',
+    public: false,
+    apps: [],
+    disableAddEntropySetup: true,
   },
 }
 
