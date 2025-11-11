@@ -519,7 +519,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   v: {
     id: 'v',
     sku: 'brnr128a25u-magazine',
-    color: themeBaseColors.acid,
+    color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/usecase-bg.jpg',
     backgroundSize: '82px',
     backgroundRepeat: 'repeat',
