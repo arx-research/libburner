@@ -519,14 +519,20 @@ export const FullThemes: { [key: string]: ITheme } = {
   v: {
     id: 'v',
     sku: 'brnr128a25u-magazine',
-    color: themeBaseColors.acid,
-    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
-    backgroundSize: '16px',
-    backgroundRepeat: 'repeat-x',
-    backgroundBlendMode: 'soft-light',
+    color: themeBaseColors.darkGrey,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/usecase-bg.jpg',
+    backgroundSize: '82px',
+    backgroundRepeat: 'repeat',
+    backgroundBlendMode: 'normal',
     nickname: 'usecase-magazine',
     public: false,
-    apps: [],
+    apps: [
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/usecase-app.svg',
+        name: 'Usecase',
+        url: 'https://www.usecase.xyz/',
+      },
+    ],
     disableAddEntropySetup: true,
   },
 }
