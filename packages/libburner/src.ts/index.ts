@@ -7,7 +7,9 @@ import {
   defineChain,
   Hex,
   http,
-  PublicClient, recoverAddress, serializeSignature,
+  PublicClient,
+  recoverAddress,
+  serializeSignature, Transport,
   WalletClient
 } from "viem";
 import {createViemHaloAccount} from "./viem_account.js";
@@ -15,12 +17,14 @@ import {base, baseSepolia} from "viem/chains";
 import {publicActionsL2} from "viem/op-stack";
 import {relayPermitAndTransfer} from "./fullWallet/transactions/relayPermitAndTransfer.js";
 import {giftcardMakeUSD2Transfer} from "./giftcard/transactions/giftcardTransfer.js";
-import {
-  dataStructDecoder,
-  IDataStructDecoderResult
-} from "./burnerTagData/dataStructDecoder.js";
+import {dataStructDecoder, IDataStructDecoderResult} from "./burnerTagData/dataStructDecoder.js";
 import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";
-import {usd2BaseToken, usdcBaseToken, usd2BaseSepoliaToken, usdcBaseSepoliaToken} from "./tokens/subsidizedTokenSpec.js";
+import {
+  usd2BaseSepoliaToken,
+  usd2BaseToken,
+  usdcBaseSepoliaToken,
+  usdcBaseToken
+} from "./tokens/subsidizedTokenSpec.js";
 import parseDERSignature, {secp256k1Order} from "./utils/parseDERSignature.js";
 import {TSubsidizedTokenSpec} from "./tokens/index.js";
 
@@ -76,12 +80,14 @@ export type IBurnerConstructorArgs = {
   chainRpcUrls: ChainRpcUrls
   burnerData?: IGetDataResult | null
   chain?: TChainName | null
+  transport?: Transport | null
 }
 
 export default class Burner {
   haloExecCb: IHaloExecCallback
   chainRpcUrls: ChainRpcUrls
   chain: TChainName
+  transport: Transport
   burnerData: IGetDataResult | null
   keyPassword: string | null
   rawPwdDigest: string | null
@@ -90,6 +96,7 @@ export default class Burner {
     this.haloExecCb = args.haloExecCb
     this.chainRpcUrls = args.chainRpcUrls
     this.chain = args.chain ?? "base"
+    this.transport = args.transport ?? http()
     this.burnerData = args.burnerData ?? null
     this.keyPassword = null
     this.rawPwdDigest = null
@@ -237,7 +244,7 @@ export default class Burner {
   _getPublicClient(): PublicClient {
     return createPublicClient({
       chain: this._getPatchedChain(),
-      transport: http(),
+      transport: this.transport,
     }).extend(publicActionsL2()) as PublicClient
   }
 
@@ -248,7 +255,7 @@ export default class Burner {
 
     return createWalletClient({
       chain: this._getPatchedChain(),
-      transport: http(),
+      transport: this.transport,
       account: this.asViemAccount() as Account,
     })
   }
