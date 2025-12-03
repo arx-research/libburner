@@ -20,8 +20,9 @@ import {
   IDataStructDecoderResult
 } from "./burnerTagData/dataStructDecoder.js";
 import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";
-import {usd2BaseToken, usdcBaseToken} from "./tokens/subsidizedTokenSpec.js";
+import {usd2BaseToken, usdcBaseToken, usd2BaseSepoliaToken, usdcBaseSepoliaToken} from "./tokens/subsidizedTokenSpec.js";
 import parseDERSignature, {secp256k1Order} from "./utils/parseDERSignature.js";
+import {TSubsidizedTokenSpec} from "./tokens/index.js";
 
 export {Hex, Address, Chain, Account}
 export * from './error.js'
@@ -54,15 +55,33 @@ type ChainRpcUrls = {
   webSocket?: readonly string[] | undefined
 }
 
+type TTokenType = "usdc" | "usd2"
+type TChainName = "base" | "base-sepolia"
+
+type ISupportedToken = {
+  tokenType: TTokenType
+  chainName: TChainName
+  spec: TSubsidizedTokenSpec
+}
+
+const supportedTokens: ISupportedToken[] = [
+  {tokenType: "usdc", chainName: "base", spec: usdcBaseToken},
+  {tokenType: "usd2", chainName: "base", spec: usd2BaseToken},
+  {tokenType: "usdc", chainName: "base-sepolia", spec: usdcBaseSepoliaToken},
+  {tokenType: "usd2", chainName: "base-sepolia", spec: usd2BaseSepoliaToken},
+]
+
 export type IBurnerConstructorArgs = {
   haloExecCb: IHaloExecCallback
   chainRpcUrls: ChainRpcUrls
   burnerData?: IGetDataResult | null
+  chain?: TChainName | null
 }
 
 export default class Burner {
   haloExecCb: IHaloExecCallback
   chainRpcUrls: ChainRpcUrls
+  chain: TChainName
   burnerData: IGetDataResult | null
   keyPassword: string | null
   rawPwdDigest: string | null
@@ -70,9 +89,20 @@ export default class Burner {
   constructor(args: IBurnerConstructorArgs) {
     this.haloExecCb = args.haloExecCb
     this.chainRpcUrls = args.chainRpcUrls
+    this.chain = args.chain ?? "base"
     this.burnerData = args.burnerData ?? null
     this.keyPassword = null
     this.rawPwdDigest = null
+  }
+
+  _getSubsidizedToken(tokenType: TTokenType): TSubsidizedTokenSpec {
+    for (const supportedToken of supportedTokens) {
+      if (supportedToken.chainName === this.chain && supportedToken.tokenType === tokenType) {
+        return supportedToken.spec;
+      }
+    }
+
+    throw new Error("Unsupported token " + tokenType + " on chain " + this.chain);
   }
 
   async getData(): Promise<IGetDataResult> {
@@ -216,7 +246,7 @@ export default class Burner {
     }
 
     return await this._getPublicClient().readContract({
-      address: usd2BaseToken.erc2612ContractAddress as Hex,
+      address: this._getSubsidizedToken("usd2").erc2612ContractAddress as Hex,
       abi: [{
         inputs: [{name: "owner", type: "address"}],
         name: "balanceOf",
@@ -235,7 +265,7 @@ export default class Burner {
     }
 
     return await this._getPublicClient().readContract({
-      address: usdcBaseToken.erc2612ContractAddress as Hex,
+      address: this._getSubsidizedToken("usdc").erc2612ContractAddress as Hex,
       abi: [{
         inputs: [{name: "owner", type: "address"}],
         name: "balanceOf",
@@ -257,7 +287,7 @@ export default class Burner {
     const walletClient = this._getWalletClient()
 
     const callArgs = {
-      subsidizedToken: usd2BaseToken,
+      subsidizedToken: this._getSubsidizedToken("usd2"),
       publicClient: publicClient,
       walletClient: walletClient,
       sourceAddress: this.burnerData.eoaAddress,
@@ -281,7 +311,7 @@ export default class Burner {
     const walletClient = this._getWalletClient()
 
     const callArgs = {
-      subsidizedToken: usdcBaseToken,
+      subsidizedToken: this._getSubsidizedToken("usdc"),
       publicClient: publicClient,
       walletClient: walletClient,
       sourceAddress: this.burnerData.eoaAddress,

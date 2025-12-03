@@ -36,7 +36,18 @@ export const usd2BaseSepoliaToken: TSubsidizedTokenSpec = {
     'https://c79710cb.engine-usw2.thirdweb.com/relayer/cb60161b-5e90-43e5-80d6-25a7dbad5f2e',
 }
 
-export const subsidizedGasTokens: TSubsidizedTokenSpec[] = [usd2BaseToken, usdcBaseToken, usd2BaseSepoliaToken]
+export const usdcBaseSepoliaToken: TSubsidizedTokenSpec = {
+  chainId: CHAIN_ID_BASE_SEPOLIA,
+  decimals: 6,
+  minTransferAmount: BigInt(1),
+  erc2612ContractAddress: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+  receiverContractAddress: '0x435cB89960cf3475fEA36e05508bf0Da3B2445AF',
+  relayerForwarderAddress: '0xd04f98c88ce1054c90022ee34d566b9237a1203c',
+  relayerURL:
+    'https://c79710cb.engine-usw2.thirdweb.com/relayer/cb60161b-5e90-43e5-80d6-25a7dbad5f2e',
+}
+
+export const subsidizedGasTokens: TSubsidizedTokenSpec[] = [usd2BaseToken, usdcBaseToken, usd2BaseSepoliaToken, usdcBaseSepoliaToken]
 
 export function getSubsidizedGasTokenSpec(args: TGetSubsidizedGasTokenSpec) {
   for (let iterTokenSpec of subsidizedGasTokens) {
