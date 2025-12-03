@@ -76,9 +76,17 @@ function generateDeadline() {
 }
 
 async function generateDomainData(tokenAddress: Address, publicClient: PublicClient) {
+  let version = "1"
+
+  if (tokenAddress.toLowerCase() === '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'.toLowerCase()) {
+    version = "2"
+  } else if (tokenAddress.toLowerCase() === '0x036CbD53842c5426634e7929541eC2318f3dCF7e'.toLowerCase()) {
+    version = "2"
+  }
+
   return {
     name: await getERC2612TokenName(tokenAddress, publicClient),
-    version: tokenAddress.toLowerCase() === '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'.toLowerCase() ? '2' : '1',
+    version: version,
     chainId: await getChainId(publicClient),
     verifyingContract: tokenAddress as Hex,
   }
