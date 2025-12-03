@@ -11,7 +11,7 @@ import {
   WalletClient
 } from "viem";
 import {createViemHaloAccount} from "./viem_account.js";
-import {base} from "viem/chains";
+import {base, baseSepolia} from "viem/chains";
 import {publicActionsL2} from "viem/op-stack";
 import {relayPermitAndTransfer} from "./fullWallet/transactions/relayPermitAndTransfer.js";
 import {giftcardMakeUSD2Transfer} from "./giftcard/transactions/giftcardTransfer.js";
@@ -209,6 +209,19 @@ export default class Burner {
     return this._asViemAccountNoCheck()
   }
 
+  _getPatchedChain() {
+    switch (this.chain) {
+      case 'base':
+        return this._patchChain(base)
+
+      case 'base-sepolia':
+        return this._patchChain(baseSepolia)
+
+      default:
+        throw new Error("Unsupported chain: " + this.chain)
+    }
+  }
+
   _patchChain(chain: Chain) {
     return defineChain({
       ...chain,
@@ -223,7 +236,7 @@ export default class Burner {
 
   _getPublicClient(): PublicClient {
     return createPublicClient({
-      chain: this._patchChain(base),
+      chain: this._getPatchedChain(),
       transport: http(),
     }).extend(publicActionsL2()) as PublicClient
   }
@@ -234,7 +247,7 @@ export default class Burner {
     }
 
     return createWalletClient({
-      chain: this._patchChain(base),
+      chain: this._getPatchedChain(),
       transport: http(),
       account: this.asViemAccount() as Account,
     })
@@ -332,7 +345,7 @@ export default class Burner {
     }
 
     const callData = {
-      chain: this._patchChain(base),
+      chain: this._getPatchedChain(),
       publicClient: this._getPublicClient(),
       eoaAccount: this._asViemAccountNoCheck(),
       smartAccountAddress: this.burnerData.address as Address,
