@@ -33,7 +33,7 @@ export const usd2BaseSepoliaToken: TSubsidizedTokenSpec = {
   receiverContractAddress: '0x3ECe77731794C007E9ABeB3D84D723af5d0259Ee',
   relayerForwarderAddress: '0xd04f98c88ce1054c90022ee34d566b9237a1203c',
   relayerURL:
-    'https://c79710cb.engine-usw2.thirdweb.com/relayer/cb60161b-5e90-43e5-80d6-25a7dbad5f2e',
+    'https://4392b34c.engine-usw2.thirdweb.com/relayer/cdd89c89-39e4-4ab8-a51d-922be4d67773',
 }
 
 export const usdcBaseSepoliaToken: TSubsidizedTokenSpec = {
@@ -44,7 +44,7 @@ export const usdcBaseSepoliaToken: TSubsidizedTokenSpec = {
   receiverContractAddress: '0x435cB89960cf3475fEA36e05508bf0Da3B2445AF',
   relayerForwarderAddress: '0xd04f98c88ce1054c90022ee34d566b9237a1203c',
   relayerURL:
-    'https://c79710cb.engine-usw2.thirdweb.com/relayer/cb60161b-5e90-43e5-80d6-25a7dbad5f2e',
+    'https://4392b34c.engine-usw2.thirdweb.com/relayer/cdd89c89-39e4-4ab8-a51d-922be4d67773',
 }
 
 export const subsidizedGasTokens: TSubsidizedTokenSpec[] = [usd2BaseToken, usdcBaseToken, usd2BaseSepoliaToken, usdcBaseSepoliaToken]
