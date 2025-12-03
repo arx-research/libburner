@@ -1,6 +1,6 @@
 {
   "name": "@arx-research/libburner",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "LibBurner - High level library for Arx Burner tags interaction.",
   "contributors": [
     {
