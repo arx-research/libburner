@@ -30,7 +30,7 @@ jobs:
           yarn -v
       - name: Install dependencies
         run: |
-          yarn install --frozen-lockfile
+          yarn install --immutable
       - name: Run tsc
         run: |
           cd packages/libburner

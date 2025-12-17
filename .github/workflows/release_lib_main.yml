@@ -24,12 +24,10 @@ jobs:
           yarn -v
       - name: Install dependencies
         run: |
-          yarn install --frozen-lockfile
+          yarn install --immutable
       - name: Run tsc (libburner)
         run: |
           cd packages/libburner
           yarn tsc
       - name: Publish package to npmjs
-        run: cd packages/libburner && yarn npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.RELEASE_NPM_TOKEN }}
+        run: cd packages/libburner && yarn npm publish --provenance --access public
