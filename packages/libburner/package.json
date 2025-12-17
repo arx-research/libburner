@@ -52,7 +52,7 @@
     "@noble/secp256k1": "^2.2.3",
     "@solana/web3.js": "^1.98.4",
     "abitype": "^1.0.8",
-    "axios": "^1.8.4",
+    "axios": "^1.12.0",
     "bitcoinjs-lib": "^6.1.7",
     "viem": "2.28.0",
     "wagmi": "^2.14.13"
