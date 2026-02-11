@@ -535,6 +535,25 @@ export const FullThemes: { [key: string]: ITheme } = {
     ],
     disableAddEntropySetup: true,
   },
+  w: {
+    id: 'w',
+    sku: 'brnr128a26z-sapphire',
+    color: themeBaseColors.sapphire,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/zano-wallpaper.jpg',
+    backgroundSize: '82px',
+    backgroundRepeat: 'repeat',
+    backgroundBlendMode: 'normal',
+    nickname: 'zano-sapphire',
+    public: false,
+    apps: [
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/zano-icon.svg',
+        name: 'Zano',
+        url: 'https://burner.zano.org/',
+      },
+    ],
+    disableAddEntropySetup: true,
+  }, 
 }
 
 export const findTheme = (query?: string): ITheme => {
