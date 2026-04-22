@@ -556,13 +556,13 @@ export const FullThemes: { [key: string]: ITheme } = {
   },
   x: {
     id: 'x',
-    sku: 'brnreth26oz.sapphire',
+    sku: 'brnreth26oz-sapphire',
     color: themeBaseColors.sapphire,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/10102-wallpaper.jpg',
     backgroundSize: '82px',
     backgroundRepeat: 'repeat',
     backgroundBlendMode: 'normal',
-    nickname: 'zano-sapphire',
+    nickname: '10102-sapphire',
     public: false,
     apps: [
       {
