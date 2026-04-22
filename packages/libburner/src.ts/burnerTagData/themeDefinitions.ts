@@ -553,6 +553,24 @@ export const FullThemes: { [key: string]: ITheme } = {
       },
     ],
     disableAddEntropySetup: true,
+  },
+  x: {
+    id: 'x',
+    sku: 'brnreth26oz.sapphire',
+    color: themeBaseColors.sapphire,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/10102-wallpaper.jpg',
+    backgroundSize: '82px',
+    backgroundRepeat: 'repeat',
+    backgroundBlendMode: 'normal',
+    nickname: 'zano-sapphire',
+    public: false,
+    apps: [
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/10102-icon.svg',
+        name: '10102',
+        url: 'https://www.10102.io/',
+      },
+    ],
   }, 
 }
 
