@@ -571,7 +571,25 @@ export const FullThemes: { [key: string]: ITheme } = {
         url: 'https://www.10102.io/',
       },
     ],
-  }, 
+  },
+  y: {
+    id: 'y',
+    sku: 'brnr128a26d-frost',
+    color: themeBaseColors.sapphire,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-bg.jpg',
+    backgroundSize: '82px',
+    backgroundRepeat: 'repeat',
+    backgroundBlendMode: 'normal',
+    nickname: 'dsc-frost',
+    public: false,
+    apps: [
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-icon-SynlqeRxop5QyvzOopv7nrHAZP0xqB.svg',
+        name: 'Digital Spenders Club',
+        url: 'https://spenders.club/',
+      },
+    ],
+  },
 }
 
 export const findTheme = (query?: string): ITheme => {
