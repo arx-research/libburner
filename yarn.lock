@@ -16,7 +16,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@arx-research/libburner@workspace:packages/libburner"
   dependencies:
-    "@cometh/connect-core-sdk": "npm:^0.0.2"
     "@noble/curves": "npm:^1.9.0"
     "@noble/secp256k1": "npm:^2.2.3"
     "@solana/web3.js": "npm:^1.98.4"
@@ -57,19 +56,6 @@ __metadata:
     eventemitter3: "npm:^5.0.1"
     preact: "npm:^10.24.2"
   checksum: 10c0/39e38ab6f84e34d8a61b9baf3fb69ad20b497d6844fe3f0cb1496e89bbb990066a6e8d68446f90054394eee840f3a452330ffbb015adabc34400f36a3ef03364
-  languageName: node
-  linkType: hard
-
-"@cometh/connect-core-sdk@npm:^0.0.2":
-  version: 0.0.2
-  resolution: "@cometh/connect-core-sdk@npm:0.0.2"
-  dependencies:
-    "@rhinestone/module-sdk": "npm:^0.2.3"
-    abitype: "npm:^1.0.8"
-    permissionless: "npm:^0.2.39"
-  peerDependencies:
-    viem: ^2.27.3
-  checksum: 10c0/e6d463d003c52fda7f7f0ae6c6163ed26a184ff896ff5a4daeb0c6e83cb1e8f12605f336a8e51d9577bca6598373550f60ca4174fa29716e4440a55e86c054d3
   languageName: node
   linkType: hard
 
@@ -608,18 +594,6 @@ __metadata:
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
   checksum: 10c0/5bd7576bb1b38a47a7fc7b51ac9f38748e772beebc56200450c4a817d712232b8f1d3ef70532c80840243c657d491cf6a6be1e3a214cff907645819fdc34aadd
-  languageName: node
-  linkType: hard
-
-"@rhinestone/module-sdk@npm:^0.2.3":
-  version: 0.2.8
-  resolution: "@rhinestone/module-sdk@npm:0.2.8"
-  dependencies:
-    solady: "npm:^0.0.235"
-    tslib: "npm:^2.7.0"
-  peerDependencies:
-    viem: ^2.0.0
-  checksum: 10c0/70e35e3d74141e820cef532b0088c2faf6d308688f5f26a93d347137b2d8d9c699b280b82a16341a230ed5315fc749c1e1463032b8b89d7f2c0276586475fe94
   languageName: node
   linkType: hard
 
@@ -3127,19 +3101,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"permissionless@npm:^0.2.39":
-  version: 0.2.43
-  resolution: "permissionless@npm:0.2.43"
-  peerDependencies:
-    ox: 0.6.7
-    viem: ^2.23.2
-  peerDependenciesMeta:
-    ox:
-      optional: true
-  checksum: 10c0/fc2d23a8a93299925db2674641e17e2aa3a8fe7c01cafe5a3cb3e85b6549e969615b17340ed65437492b6c703837b98644551467371a8629b871749949d9994a
-  languageName: node
-  linkType: hard
-
 "picomatch@npm:^2.0.4":
   version: 2.3.1
   resolution: "picomatch@npm:2.3.1"
@@ -3599,13 +3560,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solady@npm:^0.0.235":
-  version: 0.0.235
-  resolution: "solady@npm:0.0.235"
-  checksum: 10c0/3380ef3ba885ada70c1d4d8ef1be5fed61d6851ad15dbba7525626deec9cc33a839b461e2b3c51448149603aedb2282f1a0ddf1a676068ca5546ade49d66c484
-  languageName: node
-  linkType: hard
-
 "sonic-boom@npm:^2.2.1":
   version: 2.8.0
   resolution: "sonic-boom@npm:2.8.0"
@@ -3801,7 +3755,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.0, tslib@npm:^2.3.1, tslib@npm:^2.6.0, tslib@npm:^2.7.0, tslib@npm:^2.8.0":
+"tslib@npm:^2.0.0, tslib@npm:^2.3.1, tslib@npm:^2.6.0, tslib@npm:^2.8.0":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
