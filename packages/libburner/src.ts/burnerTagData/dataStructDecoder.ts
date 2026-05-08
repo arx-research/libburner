@@ -6,7 +6,6 @@ import uncompressPk from "../utils/uncompressPk.js";
 import hexDecode from "../utils/hexDecode.js";
 import pknToAddressETH from "../utils/pknToAddressETH.js";
 import pknToAddressBTC from "../utils/pknToAddressBTC.js";
-import {computeGiftcardAddress} from "../giftcard/index.js";
 import pknToSOLAddresses from "../utils/pknToSOLAddresses.js";
 
 
@@ -27,7 +26,6 @@ export type IDataStructDecoderResult = {
   pkN: string
   pkNAttest: string | undefined
   eoaAddress: Address
-  smartAccount: Address
   btcAddress: string
   solAddresses: {
     vaultPDA: string
@@ -117,7 +115,6 @@ export async function dataStructDecoder(
   // If there's a pk9 but not graffiti they aborted early, finish setup
   if (graffitiRaw == null && typeof pk9RawCompressed === 'string') {
     const eoaAddress = pknToAddressETH(pk9RawCompressed)
-    const smartAccount = await computeGiftcardAddress(eoaAddress)
     const btcAddress = pknToAddressBTC(pk9RawCompressed)
     const solAddresses = pknToSOLAddresses(pk9RawCompressed)
     const usePk9Attest = typeof pk9Attest === 'string'
@@ -133,7 +130,6 @@ export async function dataStructDecoder(
       pkN: uncompressPk(pk9RawCompressed),
       pkNAttest: usePk9Attest,
       eoaAddress,
-      smartAccount,
       btcAddress,
       solAddresses,
       keyNumber: 9,
@@ -149,7 +145,6 @@ export async function dataStructDecoder(
   // If its a new card save pk8 and go to step 1
   if (graffitiRaw === null && typeof pk8RawCompressed === 'string') {
     const eoaAddress = pknToAddressETH(pk8RawCompressed)
-    const smartAccount = await computeGiftcardAddress(eoaAddress)
     const btcAddress = pknToAddressBTC(pk8RawCompressed)
     const solAddresses = pknToSOLAddresses(pk8RawCompressed)
     const usePk8Attest = typeof pk8Attest === 'string'
@@ -165,7 +160,6 @@ export async function dataStructDecoder(
       pkN: uncompressPk(pk8RawCompressed),
       pkNAttest: usePk8Attest,
       eoaAddress,
-      smartAccount,
       btcAddress,
       solAddresses,
       keyNumber: 8,
@@ -186,7 +180,6 @@ export async function dataStructDecoder(
     const theme = findTheme(graffiti?.themeId)
 
     const eoaAddress = pknToAddressETH(pk9RawCompressed)
-    const smartAccount = await computeGiftcardAddress(eoaAddress)
     const btcAddress = pknToAddressBTC(pk9RawCompressed)
     const solAddresses = pknToSOLAddresses(pk9RawCompressed)
     const usePk9Attest = typeof pk9Attest === 'string'
@@ -202,7 +195,6 @@ export async function dataStructDecoder(
       pkN: uncompressPk(pk9RawCompressed),
       pkNAttest: usePk9Attest,
       eoaAddress,
-      smartAccount,
       btcAddress,
       solAddresses,
       keyNumber: 9,
@@ -221,7 +213,6 @@ export async function dataStructDecoder(
     const theme = findTheme(graffiti?.themeId)
 
     const eoaAddress = pknToAddressETH(pk8RawCompressed)
-    const smartAccount = await computeGiftcardAddress(eoaAddress)
     const btcAddress = pknToAddressBTC(pk8RawCompressed)
     const solAddresses = pknToSOLAddresses(pk8RawCompressed)
     const usePk8Attest = typeof pk8Attest === 'string'
@@ -237,7 +228,6 @@ export async function dataStructDecoder(
       pkN: uncompressPk(pk8RawCompressed),
       pkNAttest: usePk8Attest,
       eoaAddress,
-      smartAccount,
       btcAddress,
       solAddresses,
       keyNumber: 8,

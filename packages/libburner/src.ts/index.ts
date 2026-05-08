@@ -16,9 +16,7 @@ import {createViemHaloAccount} from "./viem_account.js";
 import {base, baseSepolia} from "viem/chains";
 import {publicActionsL2} from "viem/op-stack";
 import {relayPermitAndTransfer} from "./fullWallet/transactions/relayPermitAndTransfer.js";
-import {giftcardMakeUSD2Transfer} from "./giftcard/transactions/giftcardTransfer.js";
 import {dataStructDecoder, IDataStructDecoderResult} from "./burnerTagData/dataStructDecoder.js";
-import {computeGiftcardAddress} from "./giftcard/smartAccount/address.js";
 import {
   usd2BaseSepoliaToken,
   usd2BaseToken,
@@ -126,9 +124,7 @@ export default class Burner {
     const decoded = await dataStructDecoder(response)
     let address
 
-    if (decoded.graffiti && decoded.graffiti.type === 'giftcard') {
-      address = await computeGiftcardAddress(decoded.eoaAddress as Address)
-    } else if (decoded.graffiti && decoded.graffiti.type === 'wallet') {
+    if (decoded.graffiti && decoded.graffiti.type === 'wallet') {
       address = decoded.eoaAddress
     } else {
       throw new Error('Unexpected Burner graffiti type.')
@@ -346,27 +342,6 @@ export default class Burner {
     }
   }
 
-  async _sendUSD2Giftcard(args: ISendUSD2Args) {
-    if (!this.burnerData) {
-      throw new Error("Missing burner data.")
-    }
-
-    const callData = {
-      chain: this._getPatchedChain(),
-      publicClient: this._getPublicClient(),
-      eoaAccount: this._asViemAccountNoCheck(),
-      smartAccountAddress: this.burnerData.address as Address,
-      destinationAddress: args.destinationAddress as Address,
-      amount: args.amount,
-    }
-
-    if (args.preSendCallback) {
-      return await giftcardMakeUSD2Transfer({...callData, preSendCallback: args.preSendCallback})
-    } else {
-      return await giftcardMakeUSD2Transfer({...callData})
-    }
-  }
-
   async sendUSD2(args: ISendUSD2Args & { preSendCallback?: null | undefined }): Promise<string>;
   async sendUSD2(args: ISendUSD2Args & { preSendCallback: () => Promise<boolean> }): Promise<string | null>;
 
@@ -377,8 +352,6 @@ export default class Burner {
 
     if (this.burnerData.graffiti.type === "wallet") {
       return await this._sendUSD2Wallet(args)
-    } else if (this.burnerData.graffiti.type === "giftcard") {
-      return await this._sendUSD2Giftcard(args)
     } else {
       throw new Error("Unsupported tag type: " + this.burnerData.graffiti.type)
     }

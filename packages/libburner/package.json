@@ -1,6 +1,6 @@
 {
   "name": "@arx-research/libburner",
-  "version": "0.10.3",
+  "version": "0.11.0",
   "description": "LibBurner - High level library for Arx Burner tags interaction.",
   "contributors": [
     {
@@ -33,9 +33,6 @@
     "./fullWallet": {
       "import": "./lib.esm/fullWallet/index.js"
     },
-    "./giftcard": {
-      "import": "./lib.esm/giftcard/index.js"
-    },
     "./tokens": {
       "import": "./lib.esm/tokens/index.js"
     },
@@ -47,7 +44,6 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@cometh/connect-core-sdk": "^0.0.2",
     "@noble/curves": "^1.9.0",
     "@noble/secp256k1": "^2.2.3",
     "@solana/web3.js": "^1.98.4",
