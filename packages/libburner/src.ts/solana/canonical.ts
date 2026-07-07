@@ -15,25 +15,35 @@ import { ExecuteK1, Operation, packAccountFlags } from "./types.js";
 // ----------------------------------------------------------------------------
 //
 // These are the non-ExecuteK1 chip-signed payloads. The layout MUST match the
-// on-chain program byte-for-byte or signature verification fails on-chain:
+// on-chain program (utils::aux_chip_message) byte-for-byte or signature
+// verification fails on-chain:
 //
-//     tag_ascii | wallet_pda(32) | nonce_u64le(8) | expiry_slot_u64le(8) [| program(32)]
+//   version(1) | tag_ascii | cluster(8) | wallet(32) | nonce_u64le(8) | expiry_u64le(8) [| program(32)]
 //
-// The chip signs keccak256 of these bytes. Tags used on-chain:
+// The chip signs keccak256 of these bytes. The cluster binds the signature to a
+// single deployment (prevents cross-cluster replay); the version byte prevents
+// cross-format reinterpretation. Tags used on-chain:
 //   "burner-allowlist-init" | "burner-allowlist-add" | "burner-allowlist-rm"
 //   "burner-danger-arm"     | "burner-danger-disarm"
 
+/** Format version for aux chip messages — must equal AUX_MSG_VERSION on-chain. */
+export const AUX_MSG_VERSION = 1;
+
 export function auxChipMessage(
   tag: string,
+  cluster: Uint8Array,
   walletPda: PublicKey,
   nonce: bigint,
   expirySlot: bigint,
   program?: PublicKey
 ): Uint8Array {
+  if (cluster.length !== 8) throw new Error("cluster must be 8 bytes");
   const tagBytes = new TextEncoder().encode(tag);
-  const out = new Uint8Array(tagBytes.length + 32 + 8 + 8 + (program ? 32 : 0));
+  const out = new Uint8Array(1 + tagBytes.length + 8 + 32 + 8 + 8 + (program ? 32 : 0));
   let o = 0;
+  out[o++] = AUX_MSG_VERSION;
   out.set(tagBytes, o); o += tagBytes.length;
+  out.set(cluster, o); o += 8;
   out.set(walletPda.toBytes(), o); o += 32;
   writeU64LE(out, o, nonce); o += 8;
   writeU64LE(out, o, expirySlot); o += 8;
@@ -44,12 +54,13 @@ export function auxChipMessage(
 /** Canonical bytes for the dangerous-invoke arm/disarm chip messages. */
 export function dangerMessageBytes(
   kind: "arm" | "disarm",
+  cluster: Uint8Array,
   walletPda: PublicKey,
   nonce: bigint,
   expirySlot: bigint
 ): Uint8Array {
   const tag = kind === "arm" ? "burner-danger-arm" : "burner-danger-disarm";
-  return auxChipMessage(tag, walletPda, nonce, expirySlot);
+  return auxChipMessage(tag, cluster, walletPda, nonce, expirySlot);
 }
 
 // ----------------------------------------------------------------------------
