@@ -531,9 +531,10 @@ export class SolanaBurnerWallet {
   async initUserAllowlist(opts: { expirySlotOffset?: bigint } = {}): Promise<string> {
     const expirySlot = await this.computeExpiry(opts.expirySlotOffset);
     const nonce = await this.requireNonce();
-    const digest = chipDigestForAllowlist("burner-allowlist-init", this.addresses.wallet, nonce, expirySlot);
+    const cluster = clusterBytes(this.cluster);
+    const digest = chipDigestForAllowlist("burner-allowlist-init", cluster, this.addresses.wallet, nonce, expirySlot);
     const sig = await this.chip.sign(digest);
-    const messageBytes = chipMessageForAllowlist("burner-allowlist-init", this.addresses.wallet, nonce, expirySlot);
+    const messageBytes = chipMessageForAllowlist("burner-allowlist-init", cluster, this.addresses.wallet, nonce, expirySlot);
     const secp = buildSecp256k1Ix(this.chip.address, messageBytes, sig).ix;
     const ix = buildInitUserAllowlistIx(expirySlot, {
       wallet: this.addresses.wallet,
@@ -584,7 +585,13 @@ export class SolanaBurnerWallet {
   async armDangerousInvoke(opts: { expirySlotOffset?: bigint } = {}): Promise<string> {
     const expirySlot = await this.computeExpiry(opts.expirySlotOffset);
     const nonce = await this.requireNonce();
-    const messageBytes = dangerMessageBytes("arm", this.addresses.wallet, nonce, expirySlot);
+    const messageBytes = dangerMessageBytes(
+      "arm",
+      clusterBytes(this.cluster),
+      this.addresses.wallet,
+      nonce,
+      expirySlot
+    );
     const digest = keccak_256(messageBytes);
     const sig = await this.chip.sign(digest);
     const secp = buildSecp256k1Ix(this.chip.address, messageBytes, sig).ix;
@@ -601,7 +608,13 @@ export class SolanaBurnerWallet {
   async disarmDangerousInvoke(opts: { expirySlotOffset?: bigint } = {}): Promise<string> {
     const expirySlot = await this.computeExpiry(opts.expirySlotOffset);
     const nonce = await this.requireNonce();
-    const messageBytes = dangerMessageBytes("disarm", this.addresses.wallet, nonce, expirySlot);
+    const messageBytes = dangerMessageBytes(
+      "disarm",
+      clusterBytes(this.cluster),
+      this.addresses.wallet,
+      nonce,
+      expirySlot
+    );
     const digest = keccak_256(messageBytes);
     const sig = await this.chip.sign(digest);
     const secp = buildSecp256k1Ix(this.chip.address, messageBytes, sig).ix;
@@ -721,8 +734,9 @@ export class SolanaBurnerWallet {
   ): Promise<string> {
     const expirySlot = await this.computeExpiry(opts.expirySlotOffset);
     const nonce = await this.requireNonce();
-    const messageBytes = chipMessageForAllowlist(tag, this.addresses.wallet, nonce, expirySlot, program);
-    const digest = chipDigestForAllowlist(tag, this.addresses.wallet, nonce, expirySlot, program);
+    const cluster = clusterBytes(this.cluster);
+    const messageBytes = chipMessageForAllowlist(tag, cluster, this.addresses.wallet, nonce, expirySlot, program);
+    const digest = chipDigestForAllowlist(tag, cluster, this.addresses.wallet, nonce, expirySlot, program);
     const sig = await this.chip.sign(digest);
     const secp = buildSecp256k1Ix(this.chip.address, messageBytes, sig).ix;
     return this.send([secp, mkIx(expirySlot)]);
@@ -845,22 +859,24 @@ export class SolanaBurnerWallet {
 // source of truth for the on-chain byte format.
 function chipMessageForAllowlist(
   tag: string,
+  cluster: Uint8Array,
   walletPda: PublicKey,
   nonce: bigint,
   expirySlot: bigint,
   program?: PublicKey
 ): Uint8Array {
-  return auxChipMessage(tag, walletPda, nonce, expirySlot, program);
+  return auxChipMessage(tag, cluster, walletPda, nonce, expirySlot, program);
 }
 
 function chipDigestForAllowlist(
   tag: string,
+  cluster: Uint8Array,
   walletPda: PublicKey,
   nonce: bigint,
   expirySlot: bigint,
   program?: PublicKey
 ): Uint8Array {
-  return keccak_256(chipMessageForAllowlist(tag, walletPda, nonce, expirySlot, program));
+  return keccak_256(chipMessageForAllowlist(tag, cluster, walletPda, nonce, expirySlot, program));
 }
 
 function writeU64LE(buf: Uint8Array, offset: number, value: bigint): void {

@@ -35,12 +35,17 @@ function refU64LE(v) {
   return out;
 }
 
-// Exactly what the Rust program hashes:
-//   tag_ascii | wallet(32) | nonce_u64le | expiry_u64le
+// Devnet cluster bytes (8), matching a default-feature program build.
+const CLUSTER = new TextEncoder().encode("devnet  ");
+
+// Exactly what the Rust program hashes (utils::aux_chip_message):
+//   version(1) | tag_ascii | cluster(8) | wallet(32) | nonce_u64le | expiry_u64le
 function refAuxMessage(tag, wallet, nonce, expiry) {
   const t = new TextEncoder().encode(tag);
   return new Uint8Array([
+    1, // AUX_MSG_VERSION
     ...t,
+    ...CLUSTER,
     ...wallet.toBytes(),
     ...refU64LE(nonce),
     ...refU64LE(expiry),
@@ -58,20 +63,32 @@ const NONCE = 42n;
 const EXPIRY = 123_456_789n;
 
 test("arm message bytes match the on-chain layout", () => {
-  const got = dangerMessageBytes("arm", WALLET, NONCE, EXPIRY);
+  const got = dangerMessageBytes("arm", CLUSTER, WALLET, NONCE, EXPIRY);
   assert.deepEqual(got, refAuxMessage("burner-danger-arm", WALLET, NONCE, EXPIRY));
-  assert.equal(got.length, "burner-danger-arm".length + 32 + 8 + 8);
+  assert.equal(got.length, 1 + "burner-danger-arm".length + 8 + 32 + 8 + 8);
 });
 
 test("disarm message bytes match the on-chain layout", () => {
-  const got = dangerMessageBytes("disarm", WALLET, NONCE, EXPIRY);
+  const got = dangerMessageBytes("disarm", CLUSTER, WALLET, NONCE, EXPIRY);
   assert.deepEqual(got, refAuxMessage("burner-danger-disarm", WALLET, NONCE, EXPIRY));
 });
 
 test("aux message includes program suffix when provided (allowlist-add shape)", () => {
-  const withProg = auxChipMessage("burner-allowlist-add", WALLET, NONCE, EXPIRY, DANGER);
+  const withProg = auxChipMessage("burner-allowlist-add", CLUSTER, WALLET, NONCE, EXPIRY, DANGER);
   const base = refAuxMessage("burner-allowlist-add", WALLET, NONCE, EXPIRY);
   assert.deepEqual(withProg, new Uint8Array([...base, ...DANGER.toBytes()]));
+});
+
+test("cross-cluster: mainnet cluster bytes change the message (replay guard)", () => {
+  const devnet = dangerMessageBytes("arm", CLUSTER, WALLET, NONCE, EXPIRY);
+  const mainnet = dangerMessageBytes(
+    "arm",
+    new TextEncoder().encode("mainnet "),
+    WALLET,
+    NONCE,
+    EXPIRY
+  );
+  assert.notDeepEqual(devnet, mainnet);
 });
 
 test("arm ix: discriminator + expiry arg + account order", () => {
