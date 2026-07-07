@@ -29,7 +29,9 @@ import {
   clusterBytes,
 } from "./constants.js";
 import {
+  auxChipMessage,
   computeOpsHash,
+  dangerMessageBytes,
   executeK1Digest,
 } from "./canonical.js";
 import {
@@ -582,8 +584,8 @@ export class SolanaBurnerWallet {
   async armDangerousInvoke(opts: { expirySlotOffset?: bigint } = {}): Promise<string> {
     const expirySlot = await this.computeExpiry(opts.expirySlotOffset);
     const nonce = await this.requireNonce();
-    const messageBytes = chipMessageForAllowlist("burner-danger-arm", this.addresses.wallet, nonce, expirySlot);
-    const digest = chipDigestForAllowlist("burner-danger-arm", this.addresses.wallet, nonce, expirySlot);
+    const messageBytes = dangerMessageBytes("arm", this.addresses.wallet, nonce, expirySlot);
+    const digest = keccak_256(messageBytes);
     const sig = await this.chip.sign(digest);
     const secp = buildSecp256k1Ix(this.chip.address, messageBytes, sig).ix;
     const ix = buildArmDangerousInvokeIx(expirySlot, {
@@ -599,8 +601,8 @@ export class SolanaBurnerWallet {
   async disarmDangerousInvoke(opts: { expirySlotOffset?: bigint } = {}): Promise<string> {
     const expirySlot = await this.computeExpiry(opts.expirySlotOffset);
     const nonce = await this.requireNonce();
-    const messageBytes = chipMessageForAllowlist("burner-danger-disarm", this.addresses.wallet, nonce, expirySlot);
-    const digest = chipDigestForAllowlist("burner-danger-disarm", this.addresses.wallet, nonce, expirySlot);
+    const messageBytes = dangerMessageBytes("disarm", this.addresses.wallet, nonce, expirySlot);
+    const digest = keccak_256(messageBytes);
     const sig = await this.chip.sign(digest);
     const secp = buildSecp256k1Ix(this.chip.address, messageBytes, sig).ix;
     const ix = buildDisarmDangerousInvokeIx(expirySlot, {
@@ -838,6 +840,9 @@ export class SolanaBurnerWallet {
 // Allowlist canonical message helpers (separate from execute's ExecuteK1).
 // ----------------------------------------------------------------------------
 
+// Allowlist chip messages share the exact aux-message layout as the danger
+// messages — delegate to the single exported builder so there is one tested
+// source of truth for the on-chain byte format.
 function chipMessageForAllowlist(
   tag: string,
   walletPda: PublicKey,
@@ -845,16 +850,7 @@ function chipMessageForAllowlist(
   expirySlot: bigint,
   program?: PublicKey
 ): Uint8Array {
-  const tagBytes = new TextEncoder().encode(tag);
-  const len = tagBytes.length + 32 + 8 + 8 + (program ? 32 : 0);
-  const out = new Uint8Array(len);
-  let o = 0;
-  out.set(tagBytes, o); o += tagBytes.length;
-  out.set(walletPda.toBytes(), o); o += 32;
-  writeU64LE(out, o, nonce); o += 8;
-  writeU64LE(out, o, expirySlot); o += 8;
-  if (program) { out.set(program.toBytes(), o); o += 32; }
-  return out;
+  return auxChipMessage(tag, walletPda, nonce, expirySlot, program);
 }
 
 function chipDigestForAllowlist(

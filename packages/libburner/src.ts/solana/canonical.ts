@@ -1,3 +1,4 @@
+import { PublicKey } from "@solana/web3.js";
 import { keccak_256 } from "@noble/hashes/sha3";
 
 import {
@@ -8,6 +9,48 @@ import {
   MAX_OPS,
 } from "./constants.js";
 import { ExecuteK1, Operation, packAccountFlags } from "./types.js";
+
+// ----------------------------------------------------------------------------
+// Aux chip-signed messages (allowlist edits + dangerous-invoke arm/disarm)
+// ----------------------------------------------------------------------------
+//
+// These are the non-ExecuteK1 chip-signed payloads. The layout MUST match the
+// on-chain program byte-for-byte or signature verification fails on-chain:
+//
+//     tag_ascii | wallet_pda(32) | nonce_u64le(8) | expiry_slot_u64le(8) [| program(32)]
+//
+// The chip signs keccak256 of these bytes. Tags used on-chain:
+//   "burner-allowlist-init" | "burner-allowlist-add" | "burner-allowlist-rm"
+//   "burner-danger-arm"     | "burner-danger-disarm"
+
+export function auxChipMessage(
+  tag: string,
+  walletPda: PublicKey,
+  nonce: bigint,
+  expirySlot: bigint,
+  program?: PublicKey
+): Uint8Array {
+  const tagBytes = new TextEncoder().encode(tag);
+  const out = new Uint8Array(tagBytes.length + 32 + 8 + 8 + (program ? 32 : 0));
+  let o = 0;
+  out.set(tagBytes, o); o += tagBytes.length;
+  out.set(walletPda.toBytes(), o); o += 32;
+  writeU64LE(out, o, nonce); o += 8;
+  writeU64LE(out, o, expirySlot); o += 8;
+  if (program) { out.set(program.toBytes(), o); o += 32; }
+  return out;
+}
+
+/** Canonical bytes for the dangerous-invoke arm/disarm chip messages. */
+export function dangerMessageBytes(
+  kind: "arm" | "disarm",
+  walletPda: PublicKey,
+  nonce: bigint,
+  expirySlot: bigint
+): Uint8Array {
+  const tag = kind === "arm" ? "burner-danger-arm" : "burner-danger-disarm";
+  return auxChipMessage(tag, walletPda, nonce, expirySlot);
+}
 
 // ----------------------------------------------------------------------------
 // ExecuteK1 wire / chip-signed bytes
