@@ -150,25 +150,6 @@ export function serializeOperation(op: Operation): Uint8Array {
       out.set(op.data, o);
       return out;
     }
-    case "migrateAsset": {
-      if (op.asset.kind === "sol") {
-        const out = new Uint8Array(1 + 32 + 1);
-        let o = 0;
-        out[o++] = 3;
-        out.set(op.successorProgram.toBytes(), o); o += 32;
-        out[o++] = 0; // sub-tag Sol
-        return out;
-      } else {
-        const out = new Uint8Array(1 + 32 + 1 + 32 + 1);
-        let o = 0;
-        out[o++] = 3;
-        out.set(op.successorProgram.toBytes(), o); o += 32;
-        out[o++] = 1; // sub-tag Token
-        out.set(op.asset.mint.toBytes(), o); o += 32;
-        out[o++] = op.asset.decimals & 0xff;
-        return out;
-      }
-    }
   }
 }
 
