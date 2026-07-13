@@ -127,7 +127,7 @@ test("disarm ix: discriminator + account order (no payer / system program)", () 
   ]);
 });
 
-test("execute account list places danger_config at index 4 (after successors)", () => {
+test("execute account list places danger_config at index 3 (after user allowlist)", () => {
   const msg = {
     version: EXECUTE_MSG_VERSION,
     domain: DOMAIN_BYTES,
@@ -139,18 +139,19 @@ test("execute account list places danger_config at index 4 (after successors)", 
   };
   const vault = new PublicKey(new Uint8Array(32).fill(5));
 
-  // None → program-id sentinel at slot 4.
+  // Account order: wallet(0) vault(1) userAllowlist(2) dangerConfig(3) sysvar(4) system(5).
+  // None → program-id sentinel at slots 2 and 3.
   const noneIx = buildExecuteIx(msg, [], {
     wallet: WALLET,
     vault,
     remainingAccounts: [],
     programId: BURNER_PROGRAM_ID,
   });
-  assert.equal(noneIx.keys[3].pubkey.toBase58(), BURNER_PROGRAM_ID.toBase58()); // successors None
-  assert.equal(noneIx.keys[4].pubkey.toBase58(), BURNER_PROGRAM_ID.toBase58()); // danger None
-  assert.equal(noneIx.keys[5].pubkey.toBase58(), SYSVAR_INSTRUCTIONS_PUBKEY.toBase58());
+  assert.equal(noneIx.keys[2].pubkey.toBase58(), BURNER_PROGRAM_ID.toBase58()); // userAllowlist None
+  assert.equal(noneIx.keys[3].pubkey.toBase58(), BURNER_PROGRAM_ID.toBase58()); // danger None
+  assert.equal(noneIx.keys[4].pubkey.toBase58(), SYSVAR_INSTRUCTIONS_PUBKEY.toBase58());
 
-  // Provided → the actual danger config PDA at slot 4.
+  // Provided → the actual danger config PDA at slot 3.
   const withIx = buildExecuteIx(msg, [], {
     wallet: WALLET,
     vault,
@@ -158,6 +159,6 @@ test("execute account list places danger_config at index 4 (after successors)", 
     remainingAccounts: [],
     programId: BURNER_PROGRAM_ID,
   });
-  assert.equal(withIx.keys[4].pubkey.toBase58(), DANGER.toBase58());
-  assert.equal(withIx.keys[5].pubkey.toBase58(), SYSVAR_INSTRUCTIONS_PUBKEY.toBase58());
+  assert.equal(withIx.keys[3].pubkey.toBase58(), DANGER.toBase58());
+  assert.equal(withIx.keys[4].pubkey.toBase58(), SYSVAR_INSTRUCTIONS_PUBKEY.toBase58());
 });

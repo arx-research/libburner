@@ -16,8 +16,6 @@ export const WALLET_SEED = new TextEncoder().encode("burner");
 export const VAULT_SEED = new TextEncoder().encode("burner-vault");
 /** PDA seed for the per-wallet program allowlist. */
 export const USER_ALLOWLIST_SEED = new TextEncoder().encode("burner-allowlist");
-/** PDA seed for the global Successors singleton (admin-curated migration targets). */
-export const SUCCESSORS_SEED = new TextEncoder().encode("burner-successors");
 /** PDA seed for the per-wallet dangerous-invoke timelock config. */
 export const DANGER_SEED = new TextEncoder().encode("burner-danger");
 
@@ -35,7 +33,6 @@ export const MAX_OPS = 8;
 export const MAX_ACCOUNTS_PER_INVOKE = 96;
 export const MAX_INVOKE_DATA_LEN = 512;
 export const MAX_USER_ALLOWLIST_PROGRAMS = 64;
-export const MAX_SUCCESSORS = 8;
 
 /** Minimum SOL kept in the vault for rent exemption (lamports). */
 export const MIN_VAULT_BALANCE = 890_880n;

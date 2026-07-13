@@ -25,12 +25,7 @@ export interface ExecuteK1 {
 // Operations
 // ----------------------------------------------------------------------------
 
-/** Sub-tag for MigrateAsset. */
-export type MigrateAssetKind =
-  | { kind: "sol" }
-  | { kind: "token"; mint: PublicKey; decimals: number };
-
-/** Tagged union mirroring the on-chain Rust enum (discriminants 0/1/2/3). */
+/** Tagged union mirroring the on-chain Rust enum (discriminants 0/1/2). */
 export type Operation =
   | {
       kind: "transferSpl";
@@ -51,11 +46,6 @@ export type Operation =
       accounts: InvokeAccountMeta[];
       /** Raw inner-ix data. */
       data: Uint8Array;
-    }
-  | {
-      kind: "migrateAsset";
-      successorProgram: PublicKey;
-      asset: MigrateAssetKind;
     };
 
 export interface InvokeAccountMeta {

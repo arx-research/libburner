@@ -35,29 +35,23 @@ import {
   executeK1Digest,
 } from "./canonical.js";
 import {
-  buildAddSuccessorIx,
   buildArmDangerousInvokeIx,
   buildCreateTokenAccountIx,
   buildDisarmDangerousInvokeIx,
   buildExecuteIx,
-  buildInitSuccessorsIx,
   buildInitUserAllowlistIx,
   buildInitializeIx,
-  buildRemoveSuccessorIx,
   buildUserAllowlistAddIx,
   buildUserAllowlistRemoveIx,
 } from "./builders.js";
 import { buildSecp256k1Ix, patchSecpIxSelfReference } from "./secp.js";
 import {
-  deriveMigrationDestination,
-  deriveSuccessorsPDA,
   deriveWalletPDAs,
   WalletPDAs,
 } from "./pdas.js";
 import { ChipSigner, FeePayerSigner } from "./signers.js";
 import {
   ExecuteK1,
-  MigrateAssetKind,
   Operation,
 } from "./types.js";
 
@@ -389,7 +383,6 @@ export class SolanaBurnerWallet {
     opts: {
       expirySlotOffset?: bigint
       userAllowlist?: PublicKey
-      successors?: PublicKey
       /**
        * Supply the wallet's DangerConfig PDA to run inner ix's that the default
        * Op::Invoke safety filter blocks (e.g. SPL-Token Approve/SetAuthority,
@@ -442,7 +435,7 @@ export class SolanaBurnerWallet {
         expirySlotOffset: opts.expirySlotOffset,
         addressLookupTableAddresses: opts.addressLookupTableAddresses,
       },
-      { userAllowlist: opts.userAllowlist, successors: opts.successors, dangerConfig: opts.dangerConfig }
+      { userAllowlist: opts.userAllowlist, dangerConfig: opts.dangerConfig }
     );
   }
 
@@ -462,7 +455,6 @@ export class SolanaBurnerWallet {
     opts: {
       expirySlotOffset?: bigint
       userAllowlist?: PublicKey
-      successors?: PublicKey
       /** See `invokeMany` — supply to run filter-blocked ix's under armed dangerous-mode. */
       dangerConfig?: PublicKey
       addressLookupTableAddresses?: PublicKey[]
@@ -520,7 +512,7 @@ export class SolanaBurnerWallet {
         expirySlotOffset: opts.expirySlotOffset,
         addressLookupTableAddresses: opts.addressLookupTableAddresses,
       },
-      { userAllowlist: opts.userAllowlist, successors: opts.successors, dangerConfig: opts.dangerConfig }
+      { userAllowlist: opts.userAllowlist, dangerConfig: opts.dangerConfig }
     );
   }
 
@@ -627,58 +619,6 @@ export class SolanaBurnerWallet {
   }
 
   // -------------------------------------------------------------------------
-  // Chip-signed: migration
-  // -------------------------------------------------------------------------
-
-  async migrateSol(
-    successorProgram: PublicKey,
-    opts: { expirySlotOffset?: bigint } = {}
-  ): Promise<string> {
-    const { destVault } = deriveMigrationDestination(this.chip.address, successorProgram);
-    const op: Operation = {
-      kind: "migrateAsset",
-      successorProgram,
-      asset: { kind: "sol" },
-    };
-    const { successors } = deriveSuccessorsPDA(this.programId);
-    return this.executeOps(
-      [op],
-      [[{ pubkey: destVault, isSigner: false, isWritable: true }]],
-      opts,
-      { successors }
-    );
-  }
-
-  async migrateToken(
-    successorProgram: PublicKey,
-    mint: PublicKey,
-    decimals: number,
-    tokenProgram: PublicKey = TOKEN_PROGRAM_ID,
-    opts: { expirySlotOffset?: bigint } = {}
-  ): Promise<string> {
-    const { destVault } = deriveMigrationDestination(this.chip.address, successorProgram);
-    const source = getAssociatedTokenAddressSync(mint, this.addresses.vault, true, tokenProgram);
-    const dest = getAssociatedTokenAddressSync(mint, destVault, true, tokenProgram);
-    const op: Operation = {
-      kind: "migrateAsset",
-      successorProgram,
-      asset: { kind: "token", mint, decimals },
-    };
-    const { successors } = deriveSuccessorsPDA(this.programId);
-    return this.executeOps(
-      [op],
-      [[
-        { pubkey: source, isSigner: false, isWritable: true },
-        { pubkey: dest, isSigner: false, isWritable: true },
-        { pubkey: mint, isSigner: false, isWritable: false },
-        { pubkey: tokenProgram, isSigner: false, isWritable: false },
-      ]],
-      opts,
-      { successors }
-    );
-  }
-
-  // -------------------------------------------------------------------------
   // Internal: shared execute path
   // -------------------------------------------------------------------------
 
@@ -691,7 +631,7 @@ export class SolanaBurnerWallet {
     ops: Operation[],
     perOpRemaining: AccountMeta[][],
     opts: { expirySlotOffset?: bigint; addressLookupTableAddresses?: PublicKey[] },
-    extra: { userAllowlist?: PublicKey; successors?: PublicKey; dangerConfig?: PublicKey } = {}
+    extra: { userAllowlist?: PublicKey; dangerConfig?: PublicKey } = {}
   ): Promise<string> {
     if (ops.length !== perOpRemaining.length) {
       throw new Error("ops.length must equal perOpRemaining.length");
@@ -718,7 +658,6 @@ export class SolanaBurnerWallet {
       wallet: this.addresses.wallet,
       vault: this.addresses.vault,
       userAllowlist: extra.userAllowlist,
-      successors: extra.successors,
       dangerConfig: extra.dangerConfig,
       remainingAccounts: perOpRemaining.flat(),
       programId: this.programId,
@@ -910,6 +849,5 @@ function serializeExecuteK1Wire(msg: ExecuteK1): Uint8Array {
   return out;
 }
 
-// Silence "unused" for these (consumers may want to mention the enum kind).
-export { MigrateAssetKind };
+// Silence "unused" for this (consumers may want to mention the enum kind).
 export { Operation };

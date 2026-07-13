@@ -20,7 +20,6 @@ import { DISC } from "./discriminators.js";
 import { serializeExecuteK1 } from "./canonical.js";
 import {
   ExecuteK1,
-  MigrateAssetKind,
   Operation,
   packAccountFlags,
 } from "./types.js";
@@ -68,25 +67,6 @@ export function serializeOperationWire(op: Operation): Uint8Array {
       writeU32LE(out, o, op.data.length); o += 4;
       out.set(op.data, o);
       return out;
-    }
-    case "migrateAsset": {
-      if (op.asset.kind === "sol") {
-        const out = new Uint8Array(1 + 32 + 1);
-        let o = 0;
-        out[o++] = 3;
-        out.set(op.successorProgram.toBytes(), o); o += 32;
-        out[o++] = 0;
-        return out;
-      } else {
-        const out = new Uint8Array(1 + 32 + 1 + 32 + 1);
-        let o = 0;
-        out[o++] = 3;
-        out.set(op.successorProgram.toBytes(), o); o += 32;
-        out[o++] = 1;
-        out.set(op.asset.mint.toBytes(), o); o += 32;
-        out[o++] = op.asset.decimals & 0xff;
-        return out;
-      }
     }
   }
 }
@@ -169,8 +149,6 @@ export interface ExecuteAccounts {
   vault: PublicKey;
   /** Pass undefined for None (using program-id sentinel under the hood). */
   userAllowlist?: PublicKey;
-  /** Pass undefined for None. */
-  successors?: PublicKey;
   /**
    * Per-wallet dangerous-invoke timelock config. Pass undefined for None (the
    * Op::Invoke safety filter then applies). Only needs to be supplied when a
@@ -182,8 +160,6 @@ export interface ExecuteAccounts {
    *   - TransferSol:        [recipient]
    *   - TransferSpl:        [source, dest, mint, token_program]
    *   - Invoke:             [...inner_accounts, target_program]
-   *   - MigrateAsset Sol:   [destination_vault]
-   *   - MigrateAsset Token: [source, dest, mint, token_program]
    *
    * The order across ops must match `ops`. Each entry's flags reflect what the
    * on-chain CPI needs (vault is typically writable + signer-via-seeds; etc.).
@@ -217,7 +193,6 @@ export function buildExecuteIx(
     { pubkey: accounts.wallet, isSigner: false, isWritable: true },
     { pubkey: accounts.vault, isSigner: false, isWritable: true },
     { pubkey: accounts.userAllowlist ?? noneSentinel, isSigner: false, isWritable: false },
-    { pubkey: accounts.successors ?? noneSentinel, isSigner: false, isWritable: false },
     { pubkey: accounts.dangerConfig ?? noneSentinel, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
@@ -367,74 +342,6 @@ export function buildDisarmDangerousInvokeIx(
 }
 
 // ----------------------------------------------------------------------------
-// Successors instructions (admin)
-// ----------------------------------------------------------------------------
-
-export interface InitSuccessorsAccounts {
-  successors: PublicKey;
-  admin: PublicKey;
-  payer: PublicKey;
-  programId?: PublicKey;
-}
-
-export function buildInitSuccessorsIx(
-  accounts: InitSuccessorsAccounts
-): TransactionInstruction {
-  return new TransactionInstruction({
-    keys: [
-      { pubkey: accounts.successors, isSigner: false, isWritable: true },
-      { pubkey: accounts.admin, isSigner: true, isWritable: false },
-      { pubkey: accounts.payer, isSigner: true, isWritable: true },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-    ],
-    programId: accounts.programId ?? BURNER_PROGRAM_ID,
-    data: Buffer.from(DISC.init_successors),
-  });
-}
-
-export interface AdminSuccessorAccounts {
-  successors: PublicKey;
-  admin: PublicKey;
-  programId?: PublicKey;
-}
-
-export function buildAddSuccessorIx(
-  successorProgram: PublicKey,
-  accounts: AdminSuccessorAccounts
-): TransactionInstruction {
-  const data = new Uint8Array(8 + 32);
-  data.set(DISC.add_successor, 0);
-  data.set(successorProgram.toBytes(), 8);
-  return new TransactionInstruction({
-    keys: [
-      { pubkey: accounts.successors, isSigner: false, isWritable: true },
-      { pubkey: accounts.admin, isSigner: true, isWritable: true },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-    ],
-    programId: accounts.programId ?? BURNER_PROGRAM_ID,
-    data: Buffer.from(data),
-  });
-}
-
-export function buildRemoveSuccessorIx(
-  successorProgram: PublicKey,
-  accounts: AdminSuccessorAccounts
-): TransactionInstruction {
-  const data = new Uint8Array(8 + 32);
-  data.set(DISC.remove_successor, 0);
-  data.set(successorProgram.toBytes(), 8);
-  return new TransactionInstruction({
-    keys: [
-      { pubkey: accounts.successors, isSigner: false, isWritable: true },
-      { pubkey: accounts.admin, isSigner: true, isWritable: true },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-    ],
-    programId: accounts.programId ?? BURNER_PROGRAM_ID,
-    data: Buffer.from(data),
-  });
-}
-
-// ----------------------------------------------------------------------------
 // Helpers
 // ----------------------------------------------------------------------------
 
@@ -464,6 +371,3 @@ function concat(...arrs: Uint8Array[]): Uint8Array {
   for (const a of arrs) { out.set(a, o); o += a.length; }
   return out;
 }
-
-// Re-export the discriminant tag for migrate-asset to silence "unused import" warnings.
-export { MigrateAssetKind };

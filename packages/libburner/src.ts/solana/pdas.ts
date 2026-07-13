@@ -4,7 +4,6 @@ import {
   VAULT_SEED,
   WALLET_SEED,
   USER_ALLOWLIST_SEED,
-  SUCCESSORS_SEED,
   DANGER_SEED,
 } from "./constants.js";
 
@@ -61,29 +60,3 @@ export function deriveWalletPDAs(
   };
 }
 
-/** The Successors singleton PDA. */
-export function deriveSuccessorsPDA(
-  programId: PublicKey = BURNER_PROGRAM_ID
-): { successors: PublicKey; bump: number } {
-  const [successors, bump] = PublicKey.findProgramAddressSync(
-    [SUCCESSORS_SEED],
-    programId
-  );
-  return { successors, bump };
-}
-
-/**
- * Compute the destination wallet+vault PDAs that `Op::MigrateAsset` will
- * derive on-chain when migrating to `successorProgram`. The successor MUST use
- * the same seed convention (`["burner", k1]` and `["burner-vault", wallet]`).
- */
-export function deriveMigrationDestination(
-  k1Addr: Uint8Array,
-  successorProgram: PublicKey
-): { destWallet: PublicKey; destVault: PublicKey } {
-  const { wallet: destWallet, vault: destVault } = deriveWalletPDAs(
-    k1Addr,
-    successorProgram
-  );
-  return { destWallet, destVault };
-}
