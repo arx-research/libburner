@@ -14,8 +14,7 @@ import {
 import {
   dangerMessageBytes,
   auxChipMessage,
-  buildArmDangerousInvokeIx,
-  buildDisarmDangerousInvokeIx,
+  buildSetDangerousInvokeIx,
   buildExecuteIx,
   BURNER_PROGRAM_ID,
   DOMAIN_BYTES,
@@ -52,9 +51,8 @@ function refAuxMessage(tag, wallet, nonce, expiry) {
   ]);
 }
 
-// Discriminators pulled from the anchor-generated IDL (target/idl/burner_wallet.json).
-const DISC_ARM = [0x33, 0x0b, 0x28, 0xfc, 0x89, 0xd4, 0x93, 0xfc];
-const DISC_DISARM = [0x64, 0x0b, 0x11, 0xa8, 0x9d, 0xde, 0x16, 0x50];
+// Discriminator pulled from the anchor-generated IDL (target/idl/burner_wallet.json).
+const DISC_SET = [0x08, 0xb2, 0xe0, 0xdb, 0x8d, 0xc6, 0x0f, 0xb8];
 
 const WALLET = new PublicKey(new Uint8Array(32).fill(7));
 const DANGER = new PublicKey(new Uint8Array(32).fill(9));
@@ -91,16 +89,18 @@ test("cross-cluster: mainnet cluster bytes change the message (replay guard)", (
   assert.notDeepEqual(devnet, mainnet);
 });
 
-test("arm ix: discriminator + expiry arg + account order", () => {
-  const ix = buildArmDangerousInvokeIx(EXPIRY, {
+test("set_dangerous_invoke ix: discriminator + (armed, expiry) args + account order", () => {
+  const ix = buildSetDangerousInvokeIx(true, EXPIRY, {
     wallet: WALLET,
     dangerConfig: DANGER,
     payer: PAYER,
     programId: BURNER_PROGRAM_ID,
   });
-  assert.deepEqual([...ix.data.subarray(0, 8)], DISC_ARM);
-  assert.deepEqual([...ix.data.subarray(8, 16)], [...refU64LE(EXPIRY)]);
-  assert.equal(ix.data.length, 16);
+  // disc(8) | armed(1, Borsh bool) | expiry_slot(8 LE)
+  assert.deepEqual([...ix.data.subarray(0, 8)], DISC_SET);
+  assert.equal(ix.data[8], 1, "armed = true");
+  assert.deepEqual([...ix.data.subarray(9, 17)], [...refU64LE(EXPIRY)]);
+  assert.equal(ix.data.length, 17);
 
   const keys = ix.keys.map((k) => [k.pubkey.toBase58(), k.isSigner, k.isWritable]);
   assert.deepEqual(keys, [
@@ -112,19 +112,24 @@ test("arm ix: discriminator + expiry arg + account order", () => {
   ]);
 });
 
-test("disarm ix: discriminator + account order (no payer / system program)", () => {
-  const ix = buildDisarmDangerousInvokeIx(EXPIRY, {
-    wallet: WALLET,
-    dangerConfig: DANGER,
-    programId: BURNER_PROGRAM_ID,
-  });
-  assert.deepEqual([...ix.data.subarray(0, 8)], DISC_DISARM);
-  const keys = ix.keys.map((k) => [k.pubkey.toBase58(), k.isSigner, k.isWritable]);
-  assert.deepEqual(keys, [
-    [WALLET.toBase58(), false, true],
-    [DANGER.toBase58(), false, true],
-    [SYSVAR_INSTRUCTIONS_PUBKEY.toBase58(), false, false],
-  ]);
+test("set_dangerous_invoke: armed flag is the only wire difference between directions", () => {
+  const opts = {
+    wallet: WALLET, dangerConfig: DANGER, payer: PAYER, programId: BURNER_PROGRAM_ID,
+  };
+  const arm = buildSetDangerousInvokeIx(true, EXPIRY, opts);
+  const disarm = buildSetDangerousInvokeIx(false, EXPIRY, opts);
+
+  assert.equal(disarm.data[8], 0, "armed = false");
+  for (let i = 0; i < arm.data.length; i++) {
+    if (i === 8) continue;
+    assert.equal(disarm.data[i], arm.data[i], `byte ${i} must match`);
+  }
+  // ...but the CHIP messages differ, which is what actually binds the
+  // direction. A relayer flipping the flag invalidates the signature.
+  assert.notDeepEqual(
+    dangerMessageBytes("arm", CLUSTER, WALLET, NONCE, EXPIRY),
+    dangerMessageBytes("disarm", CLUSTER, WALLET, NONCE, EXPIRY)
+  );
 });
 
 test("execute account list places danger_config at index 3 (after user allowlist)", () => {

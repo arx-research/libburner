@@ -23,7 +23,8 @@ export interface WalletPDAs {
  *
  * @param k1Addr  20-byte chip address (eg `keccak256(uncompressedPubkey[1..])[12..]`)
  * @param programId  Defaults to the canonical burner_wallet program ID; pass
- *                   another to test against a successor program.
+ *                   another to target a different deployment (e.g. a localnet
+ *                   validator or a staging program).
  */
 export function deriveWalletPDAs(
   k1Addr: Uint8Array,

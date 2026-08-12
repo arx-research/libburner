@@ -11,7 +11,13 @@ import {
   SYSVAR_INSTRUCTIONS_PUBKEY,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from "@solana/spl-token";
+import {
+  TOKEN_PROGRAM_ID,
+  TOKEN_2022_PROGRAM_ID,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+  createAssociatedTokenAccountIdempotentInstruction,
+} from "@solana/spl-token";
 
 import {
   BURNER_PROGRAM_ID,
@@ -102,20 +108,28 @@ export function buildInitializeIx(
 }
 
 // ----------------------------------------------------------------------------
-// create_token_account (idempotent ATA-for-vault)
+// Vault ATA creation (SPL Associated Token Account program, not burner_wallet)
 // ----------------------------------------------------------------------------
 
 export interface CreateTokenAccountAccounts {
-  wallet: PublicKey;
   vault: PublicKey;
   mint: PublicKey;
   /** Pass undefined to derive the canonical ATA from (vault, mint, tokenProgram). */
   tokenAccount?: PublicKey;
   payer: PublicKey;
   tokenProgram?: PublicKey; // defaults to SPL Token
-  programId?: PublicKey;
 }
 
+/**
+ * Create the vault's ATA for `mint`, idempotently.
+ *
+ * This targets the SPL Associated Token Account program directly — burner_wallet
+ * has no `create_token_account` instruction. It never needed one: the ATA
+ * program derives the address from (owner, token_program, mint) and does not
+ * require the owner to sign, so it happily creates an account for an off-curve
+ * PDA like the vault. Wrapping it on-chain only added an unauthenticated entry
+ * point that took three unchecked accounts.
+ */
 export function buildCreateTokenAccountIx(
   accounts: CreateTokenAccountAccounts
 ): TransactionInstruction {
@@ -123,21 +137,14 @@ export function buildCreateTokenAccountIx(
   const tokenAccount =
     accounts.tokenAccount ??
     getAssociatedTokenAddressSync(accounts.mint, accounts.vault, true, tokenProgram);
-  const keys: AccountMeta[] = [
-    { pubkey: accounts.wallet, isSigner: false, isWritable: false },
-    { pubkey: accounts.vault, isSigner: false, isWritable: false },
-    { pubkey: accounts.mint, isSigner: false, isWritable: false },
-    { pubkey: tokenAccount, isSigner: false, isWritable: true },
-    { pubkey: accounts.payer, isSigner: true, isWritable: true },
-    { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-    { pubkey: tokenProgram, isSigner: false, isWritable: false },
-    { pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ];
-  return new TransactionInstruction({
-    keys,
-    programId: accounts.programId ?? BURNER_PROGRAM_ID,
-    data: Buffer.from(DISC.create_token_account),
-  });
+  return createAssociatedTokenAccountIdempotentInstruction(
+    accounts.payer,
+    tokenAccount,
+    accounts.vault,
+    accounts.mint,
+    tokenProgram,
+    ASSOCIATED_TOKEN_PROGRAM_ID
+  );
 }
 
 // ----------------------------------------------------------------------------
@@ -290,20 +297,30 @@ export function buildUserAllowlistRemoveIx(
 // Dangerous-invoke timelock (chip-signed)
 // ----------------------------------------------------------------------------
 
-export interface ArmDangerousInvokeAccounts {
+export interface SetDangerousInvokeAccounts {
   wallet: PublicKey;
   dangerConfig: PublicKey;
   payer: PublicKey;
   programId?: PublicKey;
 }
 
-export function buildArmDangerousInvokeIx(
+/**
+ * Arm (`armed = true`) or disarm (`armed = false`) dangerous-invoke mode.
+ *
+ * One instruction for both directions. The direction is NOT interchangeable on
+ * the wire — the chip message carries a distinct tag per direction, which the
+ * program rebuilds from this `armed` argument, so a signature obtained for one
+ * cannot be submitted as the other. See `dangerMessageBytes`.
+ */
+export function buildSetDangerousInvokeIx(
+  armed: boolean,
   expirySlot: bigint,
-  accounts: ArmDangerousInvokeAccounts
+  accounts: SetDangerousInvokeAccounts
 ): TransactionInstruction {
-  const data = new Uint8Array(8 + 8);
-  data.set(DISC.arm_dangerous_invoke, 0);
-  writeU64LE(data, 8, expirySlot);
+  const data = new Uint8Array(8 + 1 + 8);
+  data.set(DISC.set_dangerous_invoke, 0);
+  data[8] = armed ? 1 : 0;
+  writeU64LE(data, 9, expirySlot);
   return new TransactionInstruction({
     keys: [
       { pubkey: accounts.wallet, isSigner: false, isWritable: true },
@@ -311,30 +328,6 @@ export function buildArmDangerousInvokeIx(
       { pubkey: accounts.payer, isSigner: true, isWritable: true },
       { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-    ],
-    programId: accounts.programId ?? BURNER_PROGRAM_ID,
-    data: Buffer.from(data),
-  });
-}
-
-export interface DisarmDangerousInvokeAccounts {
-  wallet: PublicKey;
-  dangerConfig: PublicKey;
-  programId?: PublicKey;
-}
-
-export function buildDisarmDangerousInvokeIx(
-  expirySlot: bigint,
-  accounts: DisarmDangerousInvokeAccounts
-): TransactionInstruction {
-  const data = new Uint8Array(8 + 8);
-  data.set(DISC.disarm_dangerous_invoke, 0);
-  writeU64LE(data, 8, expirySlot);
-  return new TransactionInstruction({
-    keys: [
-      { pubkey: accounts.wallet, isSigner: false, isWritable: true },
-      { pubkey: accounts.dangerConfig, isSigner: false, isWritable: true },
-      { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
     ],
     programId: accounts.programId ?? BURNER_PROGRAM_ID,
     data: Buffer.from(data),
