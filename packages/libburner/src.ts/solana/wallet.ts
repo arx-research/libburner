@@ -402,6 +402,7 @@ export class SolanaBurnerWallet {
     if (inners.length > MAX_OPS) {
       throw new Error(`too many ops: ${inners.length} > MAX_OPS (${MAX_OPS})`);
     }
+    inners.forEach((ix) => this.assertOnlyVaultSigns(ix));
     const ops: Operation[] = inners.map((ix) => ({
       kind: "invoke",
       programId: ix.programId,
@@ -471,6 +472,7 @@ export class SolanaBurnerWallet {
         ]);
       } else {
         const { ix } = spec;
+        this.assertOnlyVaultSigns(ix);
         // CRITICAL: op-data flags (committed to ops_hash + read by on-chain
         // CPI builder) keep is_signer AS PROVIDED — Jupiter's downstream CPI
         // checks need the vault PDA marked is_signer=true so invoke_signed's
@@ -613,6 +615,33 @@ export class SolanaBurnerWallet {
   // -------------------------------------------------------------------------
   // Internal: shared execute path
   // -------------------------------------------------------------------------
+
+  /**
+   * Client-side mirror of the program's Gate 3: only the vault PDA may carry
+   * the signer bit inside an `Op::Invoke`.
+   *
+   * The program rejects anything else with `UnauthorizedInvokeSigner`, because
+   * Solana would otherwise let the CPI borrow the authority of any account that
+   * signed the outer transaction — the fee payer, in practice. Checking here
+   * turns that into a clear error *before* we ask the user to tap their chip,
+   * rather than a failed simulation afterwards.
+   *
+   * Legitimate flows already satisfy this: Jupiter and Bubblegum instructions
+   * name the vault (`userPublicKey` / `leafOwner`) as their only signer, and
+   * ATA creates — which need a funding signer — are submitted separately by the
+   * relayer rather than wrapped in a chip-signed op.
+   */
+  private assertOnlyVaultSigns(ix: TransactionInstruction): void {
+    for (const k of ix.keys) {
+      if (k.isSigner && !k.pubkey.equals(this.addresses.vault)) {
+        throw new Error(
+          `Op::Invoke to ${ix.programId.toBase58()} marks ${k.pubkey.toBase58()} as a signer, ` +
+            `but only the vault (${this.addresses.vault.toBase58()}) may sign inside an invoke. ` +
+            `The program would reject this with UnauthorizedInvokeSigner.`
+        );
+      }
+    }
+  }
 
   /**
    * Build + chip-sign + send an `execute` tx covering `ops`. Caller supplies
