@@ -35,9 +35,8 @@ import {
   executeK1Digest,
 } from "./canonical.js";
 import {
-  buildArmDangerousInvokeIx,
+  buildSetDangerousInvokeIx,
   buildCreateTokenAccountIx,
-  buildDisarmDangerousInvokeIx,
   buildExecuteIx,
   buildInitUserAllowlistIx,
   buildInitializeIx,
@@ -302,13 +301,11 @@ export class SolanaBurnerWallet {
     if (existing) return { ata, signature: null };
 
     const ix = buildCreateTokenAccountIx({
-      wallet: this.addresses.wallet,
       vault: this.addresses.vault,
       mint,
       tokenAccount: ata,
       payer: this.feePayer.publicKey,
       tokenProgram,
-      programId: this.programId,
     });
     const signature = await this.sendFeePayerOnly([ix]);
     return { ata, signature };
@@ -575,44 +572,39 @@ export class SolanaBurnerWallet {
    * elapsed — poll `fetchDangerConfig()` for `active` / `slotsUntilActive`.
    */
   async armDangerousInvoke(opts: { expirySlotOffset?: bigint } = {}): Promise<string> {
-    const expirySlot = await this.computeExpiry(opts.expirySlotOffset);
-    const nonce = await this.requireNonce();
-    const messageBytes = dangerMessageBytes(
-      "arm",
-      clusterBytes(this.cluster),
-      this.addresses.wallet,
-      nonce,
-      expirySlot
-    );
-    const digest = keccak_256(messageBytes);
-    const sig = await this.chip.sign(digest);
-    const secp = buildSecp256k1Ix(this.chip.address, messageBytes, sig).ix;
-    const ix = buildArmDangerousInvokeIx(expirySlot, {
-      wallet: this.addresses.wallet,
-      dangerConfig: this.addresses.dangerConfig,
-      payer: this.feePayer.publicKey,
-      programId: this.programId,
-    });
-    return this.send([secp, ix]);
+    return this.setDangerousInvoke("arm", opts);
   }
 
   /** Disarm dangerous-invoke mode immediately (valid even during the delay). */
   async disarmDangerousInvoke(opts: { expirySlotOffset?: bigint } = {}): Promise<string> {
+    return this.setDangerousInvoke("disarm", opts);
+  }
+
+  /**
+   * Shared arm/disarm path. The two differ only in the message tag and the
+   * `armed` flag, and both must stay in agreement — `dangerMessageBytes` picks
+   * the tag the program will rebuild from `armed`, so deriving both from one
+   * `kind` here makes a mismatch unrepresentable.
+   */
+  private async setDangerousInvoke(
+    kind: "arm" | "disarm",
+    opts: { expirySlotOffset?: bigint }
+  ): Promise<string> {
     const expirySlot = await this.computeExpiry(opts.expirySlotOffset);
     const nonce = await this.requireNonce();
     const messageBytes = dangerMessageBytes(
-      "disarm",
+      kind,
       clusterBytes(this.cluster),
       this.addresses.wallet,
       nonce,
       expirySlot
     );
-    const digest = keccak_256(messageBytes);
-    const sig = await this.chip.sign(digest);
+    const sig = await this.chip.sign(keccak_256(messageBytes));
     const secp = buildSecp256k1Ix(this.chip.address, messageBytes, sig).ix;
-    const ix = buildDisarmDangerousInvokeIx(expirySlot, {
+    const ix = buildSetDangerousInvokeIx(kind === "arm", expirySlot, {
       wallet: this.addresses.wallet,
       dangerConfig: this.addresses.dangerConfig,
+      payer: this.feePayer.publicKey,
       programId: this.programId,
     });
     return this.send([secp, ix]);
