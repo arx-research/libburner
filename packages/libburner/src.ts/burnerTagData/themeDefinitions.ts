@@ -244,8 +244,8 @@ export const FullThemes: { [key: string]: ITheme } = {
   g: {
     id: 'g',
     sku: 'brnr128a25d-green',
-    color: themeBaseColors.jade,
-    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-bg.jpg',
+    color: "#CD3A23",
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-26-bg.jpg',
     backgroundSize: '82px',
     backgroundRepeat: 'repeat',
     backgroundBlendMode: 'normal',
@@ -253,7 +253,7 @@ export const FullThemes: { [key: string]: ITheme } = {
     public: false,
     apps: [
       {
-        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-icon-SynlqeRxop5QyvzOopv7nrHAZP0xqB.svg',
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-26.svg',
         name: 'Digital Spenders Club',
         url: 'https://spenders.club/',
       },
@@ -262,8 +262,8 @@ export const FullThemes: { [key: string]: ITheme } = {
   h: {
     id: 'h',
     sku: 'brnr128a25d-orange',
-    color: themeBaseColors.mandarin,
-    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-bg.jpg',
+    color: "#CD3A23",
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-26-bg.jpg',
     backgroundSize: '82px',
     backgroundRepeat: 'repeat',
     backgroundBlendMode: 'normal',
@@ -271,7 +271,7 @@ export const FullThemes: { [key: string]: ITheme } = {
     public: false,
     apps: [
       {
-        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-icon-SynlqeRxop5QyvzOopv7nrHAZP0xqB.svg',
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-26.svg',
         name: 'Digital Spenders Club',
         url: 'https://spenders.club/',
       },
@@ -280,8 +280,8 @@ export const FullThemes: { [key: string]: ITheme } = {
   i: {
     id: 'i',
     sku: 'brnr128a25d-purple',
-    color: themeBaseColors.galaxy,
-    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-bg.jpg',
+    color: "#CD3A23",
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-26-bg.jpg',
     backgroundSize: '82px',
     backgroundRepeat: 'repeat',
     backgroundBlendMode: 'normal',
@@ -289,7 +289,7 @@ export const FullThemes: { [key: string]: ITheme } = {
     public: false,
     apps: [
       {
-        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-icon-SynlqeRxop5QyvzOopv7nrHAZP0xqB.svg',
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-26.svg',
         name: 'Digital Spenders Club',
         url: 'https://spenders.club/',
       },
@@ -575,8 +575,8 @@ export const FullThemes: { [key: string]: ITheme } = {
   y: {
     id: 'y',
     sku: 'brnr128a26d-frost',
-    color: themeBaseColors.sapphire,
-    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-bg.jpg',
+    color: "#CD3A23",
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-26-bg.jpg',
     backgroundSize: '82px',
     backgroundRepeat: 'repeat',
     backgroundBlendMode: 'normal',
@@ -584,7 +584,7 @@ export const FullThemes: { [key: string]: ITheme } = {
     public: false,
     apps: [
       {
-        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-icon-SynlqeRxop5QyvzOopv7nrHAZP0xqB.svg',
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-26.svg',
         name: 'Digital Spenders Club',
         url: 'https://spenders.club/',
       },
