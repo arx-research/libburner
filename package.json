@@ -3,5 +3,12 @@
   "packageManager": "yarn@4.12.0",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "resolutions": {
+    "@metamask/sdk": "0.33.1",
+    "@metamask/sdk-communication-layer": "0.33.1",
+    "ip-address": "10.3.1",
+    "viem/ws": "8.21.3",
+    "engine.io-client/ws": "8.21.3"
+  }
 }
