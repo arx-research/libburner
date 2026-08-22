@@ -1,6 +1,6 @@
-// Constants for the v5 Burner Solana program.
+// Constants for the burner_wallet Solana program.
 //
-// Program is deployed at the address below on both devnet (v5) and mainnet
+// Program is deployed at the address below on both devnet and mainnet
 // (v4 still — wire-incompatible). Devnet upgrade landed at slot 468,514,024
 // (sig q86CN4Y6H7YxnTcbk8uGtPfXySLNLLXf6bEPtKuTvKi6xHLwRdBhTDnoVZ7byShEE6YoVpjqPNto6tdMaR5Smwq).
 

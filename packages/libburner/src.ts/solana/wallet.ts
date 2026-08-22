@@ -64,7 +64,7 @@ export interface SolanaBurnerWalletOpts {
   chip: ChipSigner;
   /** Fee payer for execute / init txs. Pays Solana fees + ed25519-signs the tx. */
   feePayer: FeePayerSigner;
-  /** Defaults to the canonical burner_wallet program ID (v5). */
+  /** Defaults to the canonical burner_wallet program ID. */
   programId?: PublicKey;
   /** Cluster string baked into ExecuteK1. Defaults to "devnet". */
   cluster?: Cluster;

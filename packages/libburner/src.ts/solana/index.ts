@@ -1,6 +1,6 @@
-// `@arx-research/libburner/solana` — v5 Burner Solana program client.
+// `@arx-research/libburner/solana` — burner_wallet Solana program client.
 //
-// Pairs with `burner-sol-demo` v5 (on devnet at program ID
+// Pairs with `burner-sol-demo` (on devnet at program ID
 // Ev5JBnsnEAB2gTvQZqffnZ79RJaVaiVji1ReKAhcJBtv). Provides typed wrappers for
 // every instruction plus a `SolanaBurnerWallet` class that orchestrates chip
 // signing + relayer fee payer + RPC.

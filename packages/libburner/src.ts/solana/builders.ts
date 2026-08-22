@@ -1,4 +1,4 @@
-// Manual ix builders for the v5 burner_wallet program.
+// Manual ix builders for the burner_wallet program.
 //
 // We hand-roll the Anchor wire format (8-byte discriminator + Borsh args)
 // rather than depending on `@coral-xyz/anchor` so libburner stays slim and

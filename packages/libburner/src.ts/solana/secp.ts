@@ -34,8 +34,17 @@ export interface BuiltSecpIx {
  * over `messageBytes` (raw bytes — the precompile hashes them via keccak256).
  *
  * Uses Solana's `Secp256k1Program.createInstructionWithEthAddress` helper for
- * the byte layout. Self-reference index (0xff) is robust to ComputeBudget or
- * other ix's being prepended.
+ * the byte layout. The three instruction-index fields are left at 0; the caller
+ * MUST call `patchSecpIxSelfReference(ix, txIndex)` once the ix's final
+ * position is known — see the note at the end of this function.
+ *
+ * An earlier revision of this comment claimed a `0xff` "self" sentinel made the
+ * ix robust to prepended ComputeBudget instructions. That is wrong, and it
+ * contradicted the code immediately below it. Modern Solana has no such
+ * sentinel: the indices must equal the secp ix's actual tx position, and
+ * `burner_wallet` additionally requires all three to equal it (the
+ * instruction-index binding, spec 9.2 item 1). Trusting the old wording would
+ * mean skipping the patch and emitting transactions the program rejects.
  */
 export function buildSecp256k1Ix(
   ethAddress: Uint8Array,
