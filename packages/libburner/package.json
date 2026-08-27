@@ -38,14 +38,20 @@
     },
     "./utils": {
       "import": "./lib.esm/utils/index.js"
+    },
+    "./solana": {
+      "import": "./lib.esm/solana/index.js"
     }
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "tsc && node --test test/*.test.mjs"
   },
   "dependencies": {
     "@noble/curves": "^1.9.0",
+    "@noble/hashes": "^1.7.0",
     "@noble/secp256k1": "^2.2.3",
+    "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "^1.98.4",
     "abitype": "^1.0.8",
     "axios": "^1.18.0",
