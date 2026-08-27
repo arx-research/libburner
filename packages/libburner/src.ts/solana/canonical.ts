@@ -8,7 +8,7 @@ import {
   MAX_INVOKE_DATA_LEN,
   MAX_OPS,
 } from "./constants.js";
-import { ExecuteK1, Operation, packAccountFlags } from "./types.js";
+import { ExecuteK1, Operation, assertU8, packAccountFlags } from "./types.js";
 
 // ----------------------------------------------------------------------------
 // Aux chip-signed messages (allowlist edits + dangerous-invoke arm/disarm)
@@ -114,7 +114,7 @@ export function serializeOperation(op: Operation): Uint8Array {
       out.set(op.mint.toBytes(), o); o += 32;
       out.set(op.to.toBytes(), o); o += 32;
       writeU64LE(out, o, op.amount); o += 8;
-      out[o++] = op.decimals & 0xff;
+      out[o++] = assertU8(op.decimals, "decimals");
       return out;
     }
     case "transferSol": {

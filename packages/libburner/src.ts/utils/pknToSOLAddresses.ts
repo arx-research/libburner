@@ -1,33 +1,30 @@
-import pknToAddressETH from "./pknToAddressETH.js";
-import {PublicKey} from "@solana/web3.js";
-import {SOL_PROGRAM_ID} from "../config.js";
+import { pknToWalletPDAs } from "../solana/pdas.js";
 
 export interface IPKNTOSOLAddresses {
   vaultPDA: string,
   walletPDA: string,
 }
 
+/**
+ * Wallet and vault PDAs for a chip, as base58 strings.
+ *
+ * Kept as-is for compatibility — dataStructDecoder returns this shape and it is
+ * part of the public API. The derivation itself now lives in
+ * `solana/pknToWalletPDAs`, which this delegates to.
+ *
+ * Before, this file re-implemented the seed derivation and read its own
+ * SOL_PROGRAM_ID from config.ts, so the program id and the PDA seeds each had
+ * two definitions that had to agree. They did — but nothing enforced it, and a
+ * change to one would have silently produced different addresses for the same
+ * chip.
+ *
+ * For the allowlist/danger PDAs, the bumps, or PublicKey objects, call
+ * `pknToWalletPDAs` directly.
+ */
 export default function pknToSOLAddresses(pkN: string): IPKNTOSOLAddresses {
-  const haloAddress = Buffer.from(pknToAddressETH(pkN).replace("0x", ""), "hex")
-
-  // Derive Solana wallet PDA
-  const programId = new PublicKey(SOL_PROGRAM_ID);
-  const walletSeed = new TextEncoder().encode('burner');
-  const [pda] = PublicKey.findProgramAddressSync(
-    [walletSeed, haloAddress],
-    programId
-  );
-  const walletPDA = pda;
-
-  // Derive vault PDA (System Program owned account for receiving funds)
-  const vaultSeed = new TextEncoder().encode('burner-vault');
-  const [vault] = PublicKey.findProgramAddressSync(
-    [vaultSeed, walletPDA.toBytes()],
-    programId
-  );
-
+  const { wallet, vault } = pknToWalletPDAs(pkN);
   return {
     vaultPDA: vault.toBase58(),
-    walletPDA: walletPDA.toBase58(),
+    walletPDA: wallet.toBase58(),
   };
 }

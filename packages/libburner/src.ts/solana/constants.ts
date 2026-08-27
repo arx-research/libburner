@@ -1,8 +1,12 @@
-// Constants for the v5 Burner Solana program.
+// Constants for the burner_wallet Solana program.
 //
-// Program is deployed at the address below on both devnet (v5) and mainnet
-// (v4 still — wire-incompatible). Devnet upgrade landed at slot 468,514,024
-// (sig q86CN4Y6H7YxnTcbk8uGtPfXySLNLLXf6bEPtKuTvKi6xHLwRdBhTDnoVZ7byShEE6YoVpjqPNto6tdMaR5Smwq).
+// Deployed at the address below on both clusters. Deliberately no slot or
+// version numbers here: this file is published to npm and any figure baked into
+// it is stale the next time the program is upgraded. See the deployment record
+// in burner-sol-demo/docs/DEPLOYMENT.md for what is actually live.
+//
+// What DOES matter to a consumer is wire compatibility, and that is pinned by
+// EXECUTE_MSG_VERSION below plus the parity tests, not by prose.
 
 import { PublicKey } from "@solana/web3.js";
 
@@ -21,6 +25,21 @@ export const DANGER_SEED = new TextEncoder().encode("burner-danger");
 
 /** Domain separator embedded in ExecuteK1 (12 bytes). */
 export const DOMAIN_BYTES = new TextEncoder().encode("burner-v1-k1");
+
+/**
+ * Mirrors `MAX_EXPIRY_WINDOW_SLOTS` in the program (added in 1.0.2).
+ *
+ * `validate_expiry_slot` rejects `expiry_slot > current_slot + this` with
+ * `ExpiryTooFar` (6032). The window is a security parameter, not a UX one: the
+ * client chooses it and the chip has no display, so an unbounded window let a
+ * signature captured against an empty vault stand as a claim on future
+ * deposits.
+ *
+ * Kept here so a bad offset throws BEFORE the chip tap rather than after an
+ * on-chain rejection — the same reason Gate 3 is mirrored client-side. If the
+ * program's constant changes, change this with it.
+ */
+export const MAX_EXPIRY_WINDOW_SLOTS = 5_400n;
 
 /** Current ExecuteK1 format version (v2 = 101-byte wire). */
 export const EXECUTE_MSG_VERSION = 2;

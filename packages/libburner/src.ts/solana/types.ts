@@ -54,6 +54,22 @@ export interface InvokeAccountMeta {
   isWritable: boolean;
 }
 
+/**
+ * Range-check a value destined for a single wire byte.
+ *
+ * The canonical and Borsh encoders both write `decimals` as a u8. Masking with
+ * `& 0xff` was silently mapping 256 to 0 in BOTH, so the two agreed on a wrong
+ * value and no OpsHashMismatch fired — the mistake only surfaced later as a
+ * transfer_checked failure against the mint. Throwing here matches how every
+ * other numeric field is handled (see writeU64LE).
+ */
+export function assertU8(value: number, field: string): number {
+  if (!Number.isInteger(value) || value < 0 || value > 255) {
+    throw new Error(`${field} must be a u8 (0-255), got ${value}`);
+  }
+  return value;
+}
+
 /** Flag byte for one InvokeAccountMeta: bit0=is_signer, bit1=is_writable. */
 export function packAccountFlags(m: InvokeAccountMeta): number {
   return (m.isSigner ? 0b01 : 0) | (m.isWritable ? 0b10 : 0);

@@ -1,0 +1,10 @@
+# Previously-packed tarballs. Without this, `npm pack` sweeps up the .tgz
+# sitting in this directory from the last pack and nests it inside the new
+# one — 0.10.0-solana.8 was 335 KB, of which 220 KB was a verbatim copy of
+# 0.10.0-solana.7. The vendored artifact in burner-app is git-tracked, so that
+# bloat would have landed in the app repo permanently.
+*.tgz
+
+# Test fixtures and build config are not needed by consumers.
+test/
+tsconfig.json
