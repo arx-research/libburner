@@ -1,6 +1,10 @@
+export type TBurnerFlavor = 'BurnerETH' | 'BurnerBTC' | 'BurnerSOL'
+
 export interface ITheme {
   id: string
   sku: string
+  /** Which Burner app this SKU belongs to. null = unknown, do not route. */
+  flavor: TBurnerFlavor | null
   color: string
   background: string
   backgroundSize: string
@@ -32,6 +36,7 @@ export const themeBaseColors = {
 export const defaultTheme: ITheme = {
   id: '1',
   sku: 'brnr128a24a-acid',
+  flavor: 'BurnerETH',
   color: '#c1e003',
   background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
   nickname: 'acid',
@@ -46,6 +51,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   '1': {
     id: '1',
     sku: 'brnr128a24a-acid',
+    flavor: 'BurnerETH',
     color: themeBaseColors.acid,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
     nickname: 'acid',
@@ -58,6 +64,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   '2': {
     id: '2',
     sku: 'brnr128a24j-jade',
+    flavor: 'BurnerETH',
     color: themeBaseColors.jade,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
     nickname: 'jade',
@@ -70,6 +77,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   '3': {
     id: '3',
     sku: 'brnr128a24s-sapphire',
+    flavor: 'BurnerETH',
     color: themeBaseColors.sapphire,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
     nickname: 'sapphire',
@@ -82,6 +90,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   '4': {
     id: '4',
     sku: 'brnr128a24c-cherry',
+    flavor: 'BurnerETH',
     color: themeBaseColors.cherry,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
     nickname: 'cherry',
@@ -94,6 +103,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   '5': {
     id: '5',
     sku: 'brnr128a24m-mandarin',
+    flavor: 'BurnerETH',
     color: themeBaseColors.mandarin,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
     nickname: 'mandarin',
@@ -106,6 +116,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   '6': {
     id: '6',
     sku: 'brnr128a24g-galaxy',
+    flavor: 'BurnerETH',
     color: themeBaseColors.galaxy,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
     nickname: 'galaxy',
@@ -118,6 +129,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   '7': {
     id: '7',
     sku: 'custom1',
+    flavor: null,
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/custom1.jpg',
     backgroundSize: '350px',
@@ -130,6 +142,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   '8': {
     id: '8',
     sku: 'custom2',
+    flavor: null,
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/custom2.jpg',
     backgroundSize: '350px',
@@ -142,6 +155,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   '9': {
     id: '9',
     sku: 'custom3',
+    flavor: null,
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/custom3.jpg',
     backgroundSize: '350px',
@@ -154,6 +168,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   a: {
     id: 'a',
     sku: 'custom4',
+    flavor: null,
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/custom4.jpg',
     backgroundSize: '350px',
@@ -166,6 +181,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   b: {
     id: 'b',
     sku: 'custom5',
+    flavor: null,
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/custom5.jpg',
     backgroundSize: '350px',
@@ -178,6 +194,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   c: {
     id: 'c',
     sku: 'custom6',
+    flavor: null,
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/custom6.jpg',
     backgroundSize: '350px',
@@ -190,6 +207,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   d: {
     id: 'd',
     sku: 'brnr128a25g-ethglobal',
+    flavor: 'BurnerETH',
     color: themeBaseColors.mandarin,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/ethglobal-bg.jpg',
     backgroundSize: '85px',
@@ -208,6 +226,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   e: {
     id: 'e',
     sku: 'brnr128a25s-mandarin',
+    flavor: 'BurnerETH',
     color: themeBaseColors.mandarin,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/shefi-bg.jpg',
     backgroundSize: '110px',
@@ -226,6 +245,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   f: {
     id: 'f',
     sku: 'brnr128a25s-galaxy',
+    flavor: 'BurnerETH',
     color: themeBaseColors.galaxy,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/shefi-bg.jpg',
     backgroundSize: '110px',
@@ -244,6 +264,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   g: {
     id: 'g',
     sku: 'brnr128a25d-green',
+    flavor: 'BurnerETH',
     color: "#CD3A23",
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-26-bg.jpg',
     backgroundSize: '82px',
@@ -262,6 +283,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   h: {
     id: 'h',
     sku: 'brnr128a25d-orange',
+    flavor: 'BurnerETH',
     color: "#CD3A23",
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-26-bg.jpg',
     backgroundSize: '82px',
@@ -280,6 +302,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   i: {
     id: 'i',
     sku: 'brnr128a25d-purple',
+    flavor: 'BurnerETH',
     color: "#CD3A23",
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-26-bg.jpg',
     backgroundSize: '82px',
@@ -298,6 +321,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   j: {
     id: 'j',
     sku: 'brnr128a25e-ens',
+    flavor: 'BurnerETH',
     color: themeBaseColors.sapphire,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/ens-bg.jpg',
     backgroundSize: '80px',
@@ -316,6 +340,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   k: {
     id: 'k',
     sku: 'brnr128a25f-acid',
+    flavor: 'BurnerETH',
     color: themeBaseColors.acid,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
     backgroundSize: '80px',
@@ -334,6 +359,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   l: {
     id: 'l',
     sku: 'brnr128a25f-mandarin',
+    flavor: 'BurnerETH',
     color: themeBaseColors.mandarin,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
     backgroundSize: '80px',
@@ -352,6 +378,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   m: {
     id: 'm',
     sku: 'brnr128a25f-cherry',
+    flavor: 'BurnerETH',
     color: themeBaseColors.cherry,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
     backgroundSize: '80px',
@@ -370,6 +397,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   n: {
     id: 'n',
     sku: 'brnr128a25f-jade',
+    flavor: 'BurnerETH',
     color: themeBaseColors.jade,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
     backgroundSize: '80px',
@@ -388,6 +416,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   o: {
     id: 'o',
     sku: 'brnr128a25f-sapphire',
+    flavor: 'BurnerETH',
     color: themeBaseColors.sapphire,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
     backgroundSize: '80px',
@@ -406,6 +435,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   p: {
     id: 'p',
     sku: 'brnr128a25f-galaxy',
+    flavor: 'BurnerETH',
     color: themeBaseColors.galaxy,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
     backgroundSize: '80px',
@@ -424,6 +454,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   q: {
     id: "q",
     sku: "brnrbtca25b-orange",
+    flavor: 'BurnerBTC',
     color: themeBaseColors.bitcoin,
     background:
       "https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg",
@@ -437,6 +468,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   r: {
     id: 'r',
     sku: 'brnr128a25f-sapphirel1',
+    flavor: 'BurnerETH',
     color: themeBaseColors.sapphire,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
     backgroundSize: '80px',
@@ -460,6 +492,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   s: {
     id: 's',
     sku: 'brnr128a25f-cherryl1',
+    flavor: 'BurnerETH',
     color: themeBaseColors.cherry,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/eth-foundation.jpg',
     backgroundSize: '80px',
@@ -483,6 +516,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   t: {
     id: 't',
     sku: 'brnr128a25d-dgen1',
+    flavor: 'BurnerETH',
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/brnr128a25d-dgen1.jpg',
     backgroundSize: '82px',
@@ -501,6 +535,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   u: {
     id: 'u',
     sku: 'brnr128a25c-nouns',
+    flavor: 'BurnerETH',
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/noun-bg.jpg',
     backgroundSize: '82px',
@@ -519,6 +554,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   v: {
     id: 'v',
     sku: 'brnr128a25u-magazine',
+    flavor: 'BurnerETH',
     color: themeBaseColors.darkGrey,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/usecase-bg.jpg',
     backgroundSize: '82px',
@@ -538,6 +574,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   w: {
     id: 'w',
     sku: 'brnr128a26z-sapphire',
+    flavor: 'BurnerETH',
     color: themeBaseColors.sapphire,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/zano-wallpaper.jpg',
     backgroundSize: '82px',
@@ -557,6 +594,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   x: {
     id: 'x',
     sku: 'brnreth26oz-sapphire',
+    flavor: 'BurnerETH',
     color: themeBaseColors.sapphire,
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/10102-wallpaper.jpg',
     backgroundSize: '82px',
@@ -575,6 +613,7 @@ export const FullThemes: { [key: string]: ITheme } = {
   y: {
     id: 'y',
     sku: 'brnr128a26d-frost',
+    flavor: 'BurnerETH',
     color: "#CD3A23",
     background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-26-bg.jpg',
     backgroundSize: '82px',
@@ -590,6 +629,52 @@ export const FullThemes: { [key: string]: ITheme } = {
       },
     ],
   },
+  z: {
+    id: 'z',
+    sku: 'brnr128a26d-solana',
+    flavor: 'BurnerSOL',
+    color: "#CD3A23",
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/dsc-26-bg.jpg',
+    backgroundSize: '82px',
+    backgroundRepeat: 'repeat',
+    backgroundBlendMode: 'normal',
+    nickname: 'dsc-solana',
+    public: false,
+    apps: [
+      {
+        iconUrl: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/app-icons/dsc-26.svg',
+        name: 'Digital Spenders Club',
+        url: 'https://spenders.club/',
+      },
+    ],
+  },
+  A: {
+    id: 'A',
+    sku: 'brnrsola26u-ultraviolet',
+    flavor: 'BurnerSOL',
+    color: themeBaseColors.galaxy,
+    background: 'https://yxn3olywcbmko66l.public.blob.vercel-storage.com/themes/images/bottom-pattern.svg',
+    nickname: 'ultraviolet',
+    backgroundSize: '16px',
+    backgroundRepeat: 'repeat-x',
+    backgroundBlendMode: 'soft-light',
+    public: false,
+    apps: [],
+  },
+}
+
+/**
+ * Resolve a tag's product flavour from its SKU.
+ *
+ * Returns undefined when the SKU is not known to this version of the
+ * library, which callers must treat differently from a known SKU carrying
+ * a null flavour (custom1-6). Matches on sku only, and never falls back to
+ * the default theme.
+ */
+export const findFlavorBySKU = (sku?: string | null): TBurnerFlavor | null | undefined => {
+  if (!sku) return undefined
+  const theme = Object.values(FullThemes).find((t) => t.sku === sku)
+  return theme ? theme.flavor : undefined
 }
 
 export const findTheme = (query?: string): ITheme => {

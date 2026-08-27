@@ -14,3 +14,6 @@ yarn-error.log*
 .yarn/*
 
 /packages/*/lib.esm/
+
+# Packed tarballs from `npm pack` (vendored into consumers, not tracked here)
+*.tgz

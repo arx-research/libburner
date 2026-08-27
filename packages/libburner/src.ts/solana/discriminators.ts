@@ -1,4 +1,4 @@
-// Anchor instruction discriminators for the v5 burner_wallet program.
+// Anchor instruction discriminators for the burner_wallet program.
 // Computed as sha256("global:<ix_name>")[0..8] — recompute via:
 //   crypto.createHash("sha256").update("global:execute").digest().slice(0,8)
 

@@ -14,6 +14,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
+import pknToAddressETH from "../lib.esm/utils/pknToAddressETH.js";
 
 import {
   serializeExecuteK1,
@@ -23,12 +24,15 @@ import {
   patchSecpIxSelfReference,
   buildSecp256k1Ix,
   deriveWalletPDAs,
+  pknToWalletPDAs,
   DISC,
   ACCOUNT_DISC,
   BURNER_PROGRAM_ID,
   DOMAIN_BYTES,
   EXECUTE_MSG_VERSION,
   EXECUTE_MSG_SIZE,
+  MAX_EXPIRY_WINDOW_SLOTS,
+  assertU8,
   MAX_OPS,
   MAX_ACCOUNTS_PER_INVOKE,
   MAX_INVOKE_DATA_LEN,
@@ -177,6 +181,81 @@ test("computeOpsHash is keccak256 over the concatenated canonical forms", async 
     ...serializeOperation(ops[1]),
   ]);
   assert.deepEqual(computeOpsHash(ops), keccak_256(concat));
+});
+
+test("decimals is range-checked, not masked", () => {
+  // `& 0xff` mapped 256 to 0 in BOTH the canonical and Borsh encoders, so the
+  // two agreed on a wrong value and ops_hash still matched — the error only
+  // surfaced later as a transfer_checked failure against the mint. Fail loudly
+  // at encode time instead.
+  assert.equal(assertU8(0, "decimals"), 0);
+  assert.equal(assertU8(255, "decimals"), 255);
+  assert.throws(() => assertU8(256, "decimals"), /must be a u8/);
+  assert.throws(() => assertU8(-1, "decimals"), /must be a u8/);
+  assert.throws(() => assertU8(6.5, "decimals"), /must be a u8/);
+});
+
+test("pknToWalletPDAs matches deriving from the address by hand", () => {
+  // The wrapper exists because callers were doing this composition inline and
+  // getting the "0x" strip wrong. Pin that it agrees with the long form.
+  // A REAL secp256k1 point (priv = 0x11*32). pknToAddressETH validates the
+  // curve equation, so invented hex is rejected — which is correct behaviour
+  // and is exactly what my first draft of this test got wrong.
+  const pkN = "044f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa385b6b1b8ead809ca67454d9683fcf2ba03456d6fe2c4abe2b07f0fbdbb2f1c1";
+  const viaWrapper = pknToWalletPDAs(pkN);
+  const hex = pknToAddressETH(pkN).replace(/^0x/, "");
+  const viaLongForm = deriveWalletPDAs(Buffer.from(hex, "hex"));
+
+  assert.equal(viaWrapper.wallet.toBase58(), viaLongForm.wallet.toBase58());
+  assert.equal(viaWrapper.vault.toBase58(), viaLongForm.vault.toBase58());
+});
+
+test("pknToWalletPDAs derives the same wallet/vault as feature/sol's pknToSOLAddresses", () => {
+  // feature/sol's pknToSOLAddresses does:
+  //   ["burner", ethAddrBytes] -> walletPDA
+  //   ["burner-vault", walletPDA.toBytes()] -> vaultPDA
+  // against the same program id. Reimplemented here from that branch's source
+  // rather than imported, so a change to ours cannot silently redefine the
+  // thing it is being checked against.
+  // A REAL secp256k1 point (priv = 0x11*32). pknToAddressETH validates the
+  // curve equation, so invented hex is rejected — which is correct behaviour
+  // and is exactly what my first draft of this test got wrong.
+  const pkN = "044f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa385b6b1b8ead809ca67454d9683fcf2ba03456d6fe2c4abe2b07f0fbdbb2f1c1";
+
+  const ethAddr = Buffer.from(pknToAddressETH(pkN).replace(/^0x/, ""), "hex");
+  const programId = new PublicKey("Ev5JBnsnEAB2gTvQZqffnZ79RJaVaiVji1ReKAhcJBtv");
+  const [expectedWallet] = PublicKey.findProgramAddressSync(
+    [new TextEncoder().encode("burner"), ethAddr],
+    programId
+  );
+  const [expectedVault] = PublicKey.findProgramAddressSync(
+    [new TextEncoder().encode("burner-vault"), expectedWallet.toBytes()],
+    programId
+  );
+
+  const got = pknToWalletPDAs(pkN);
+  assert.equal(got.wallet.toBase58(), expectedWallet.toBase58());
+  assert.equal(got.vault.toBase58(), expectedVault.toBase58());
+});
+
+test("MAX_EXPIRY_WINDOW_SLOTS matches the program constant", () => {
+  // Written from programs/halo-wallet/src/state.rs, NOT read back from
+  // lib.esm — the whole point of this suite. The program rejects
+  // expiry_slot > current_slot + this with ExpiryTooFar (6032), and libburner
+  // checks the same bound in computeExpiry so a bad offset throws before the
+  // chip tap rather than after an on-chain rejection. If the two drift, the
+  // client either taps for a doomed transaction or refuses a legal one.
+  assert.equal(MAX_EXPIRY_WINDOW_SLOTS, 5_400n);
+});
+
+test("the default expiry offset sits well inside the cap", () => {
+  // 150 slots (~1 min) against a 5,400 cap (~36 min): 36x headroom. If someone
+  // raises the default toward the cap, this is where it gets noticed.
+  const DEFAULT_EXPIRY_OFFSET = 150n; // wallet.ts
+  assert.ok(
+    DEFAULT_EXPIRY_OFFSET * 4n < MAX_EXPIRY_WINDOW_SLOTS,
+    "default expiry offset is uncomfortably close to the program's cap",
+  );
 });
 
 test("computeOpsHash refuses to exceed MAX_OPS", () => {

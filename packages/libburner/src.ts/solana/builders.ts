@@ -1,4 +1,4 @@
-// Manual ix builders for the v5 burner_wallet program.
+// Manual ix builders for the burner_wallet program.
 //
 // We hand-roll the Anchor wire format (8-byte discriminator + Borsh args)
 // rather than depending on `@coral-xyz/anchor` so libburner stays slim and
@@ -27,6 +27,7 @@ import { serializeExecuteK1 } from "./canonical.js";
 import {
   ExecuteK1,
   Operation,
+  assertU8,
   packAccountFlags,
 } from "./types.js";
 
@@ -51,7 +52,7 @@ export function serializeOperationWire(op: Operation): Uint8Array {
       out.set(op.mint.toBytes(), o); o += 32;
       out.set(op.to.toBytes(), o); o += 32;
       writeU64LE(out, o, op.amount); o += 8;
-      out[o++] = op.decimals & 0xff;
+      out[o++] = assertU8(op.decimals, "decimals");
       return out;
     }
     case "transferSol": {

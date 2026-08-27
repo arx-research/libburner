@@ -23,6 +23,7 @@ import {
   DANGEROUS_INVOKE_DELAY_SLOTS,
   DOMAIN_BYTES,
   EXECUTE_MSG_VERSION,
+  MAX_EXPIRY_WINDOW_SLOTS,
   MAX_OPS,
   MIN_VAULT_BALANCE,
   SECP256K1_PROGRAM_ID,
@@ -64,7 +65,7 @@ export interface SolanaBurnerWalletOpts {
   chip: ChipSigner;
   /** Fee payer for execute / init txs. Pays Solana fees + ed25519-signs the tx. */
   feePayer: FeePayerSigner;
-  /** Defaults to the canonical burner_wallet program ID (v5). */
+  /** Defaults to the canonical burner_wallet program ID. */
   programId?: PublicKey;
   /** Cluster string baked into ExecuteK1. Defaults to "devnet". */
   cluster?: Cluster;
@@ -797,8 +798,23 @@ export class SolanaBurnerWallet {
   }
 
   private async computeExpiry(offset?: bigint): Promise<bigint> {
+    const off = offset ?? this.defaultExpiryOffset;
+    // Fail before the tap, not after. The program caps the window at
+    // MAX_EXPIRY_WINDOW_SLOTS and rejects anything beyond it with ExpiryTooFar
+    // (6032) — but only once the transaction reaches the chain, by which point
+    // the user has already tapped. `expirySlotOffset` is caller-supplied, so
+    // check it here.
+    if (off <= 0n) {
+      throw new Error(`expiry offset must be positive, got ${off}`);
+    }
+    if (off > MAX_EXPIRY_WINDOW_SLOTS) {
+      throw new Error(
+        `expiry offset ${off} exceeds the program's MAX_EXPIRY_WINDOW_SLOTS ` +
+          `(${MAX_EXPIRY_WINDOW_SLOTS}); the program would reject this with ExpiryTooFar`,
+      );
+    }
     const cur = BigInt(await this.connection.getSlot(this.finality));
-    return cur + (offset ?? this.defaultExpiryOffset);
+    return cur + off;
   }
 
   private async requireNonce(): Promise<bigint> {
