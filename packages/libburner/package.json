@@ -1,6 +1,6 @@
 {
   "name": "@arx-research/libburner",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "LibBurner - High level library for Arx Burner tags interaction.",
   "contributors": [
     {
@@ -25,22 +25,28 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./lib.esm/index.js"
+      "import": "./lib.esm/index.js",
+      "default": "./lib.esm/index.js"
     },
     "./burnerTagData": {
-      "import": "./lib.esm/burnerTagData/index.js"
+      "import": "./lib.esm/burnerTagData/index.js",
+      "default": "./lib.esm/burnerTagData/index.js"
     },
     "./fullWallet": {
-      "import": "./lib.esm/fullWallet/index.js"
+      "import": "./lib.esm/fullWallet/index.js",
+      "default": "./lib.esm/fullWallet/index.js"
     },
     "./tokens": {
-      "import": "./lib.esm/tokens/index.js"
+      "import": "./lib.esm/tokens/index.js",
+      "default": "./lib.esm/tokens/index.js"
     },
     "./utils": {
-      "import": "./lib.esm/utils/index.js"
+      "import": "./lib.esm/utils/index.js",
+      "default": "./lib.esm/utils/index.js"
     },
     "./solana": {
-      "import": "./lib.esm/solana/index.js"
+      "import": "./lib.esm/solana/index.js",
+      "default": "./lib.esm/solana/index.js"
     }
   },
   "scripts": {
