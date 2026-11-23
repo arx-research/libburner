@@ -28,7 +28,7 @@ __metadata:
     typescript: "npm:^5.8.3"
     viem: "npm:2.28.0"
   peerDependencies:
-    "@arx-research/libhalo": ^1.14.0
+    "@arx-research/libhalo": ^1.22.0
     viem: ^2.28.0
   languageName: unknown
   linkType: soft
