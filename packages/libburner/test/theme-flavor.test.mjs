@@ -92,12 +92,14 @@ test("latch2 on a real tag round-trips to a flavour", () => {
   assert.equal(findTheme(uv).nickname, "ultraviolet");
 });
 
-test("both Solana SKUs are declared, on different prefixes", () => {
-  // The two Solana cards do not share a prefix: brnr128a26d-solana is the DSC
-  // edition on brnr128 hardware, brnrsola26u-ultraviolet is the native brnrsol
-  // line. Prefix matching cannot cover both without also claiming every other
-  // brnr128 card, which is the whole reason flavour is declared.
+test("every Solana SKU is declared, across different prefixes", () => {
+  // The Solana cards do not share a prefix: brnr128a26d-solana and
+  // brnr128a26d-bp26 are DSC editions on brnr128 hardware,
+  // brnrsola26u-ultraviolet is the native brnrsol line. Prefix matching cannot
+  // cover them without also claiming every other brnr128 card, which is the
+  // whole reason flavour is declared.
   assert.equal(findFlavorBySKU("brnr128a26d-solana"), "BurnerSOL");
+  assert.equal(findFlavorBySKU("brnr128a26d-bp26"), "BurnerSOL");
   assert.equal(findFlavorBySKU("brnrsola26u-ultraviolet"), "BurnerSOL");
   assert.equal(findFlavorBySKU("brnr128a26d-frost"), "BurnerETH");
 });
@@ -111,12 +113,12 @@ test("theme ids stay single characters", () => {
   }
 });
 
-test("one BTC and two SOL SKUs today", () => {
+test("one BTC and three SOL SKUs today", () => {
   const counts = {};
   for (const t of Object.values(FullThemes)) {
     counts[String(t.flavor)] = (counts[String(t.flavor)] || 0) + 1;
   }
   assert.equal(counts.BurnerBTC, 1);
-  assert.equal(counts.BurnerSOL, 2);
+  assert.equal(counts.BurnerSOL, 3); // + brnr128a26d-bp26 (DSC Solana, #26)
   assert.equal(counts.null, 6);
 });
